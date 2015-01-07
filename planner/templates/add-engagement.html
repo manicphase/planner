@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_form %}
+{% block content %}
+<div class="container">
+  <h3>Add Engagement</h3>
+  {{ render_form(form, action_url=url_for('add_engagement')) }}
+</div>
+{% endblock %}

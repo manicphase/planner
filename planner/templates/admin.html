@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h3>Form Links</h3>
+  <ul class="list-unstyled">
+    <li><a name="add-engagement" href="{{ url_for('add_engagement') }}">Add Engagement </a></li>
+    <li>
+      <div class="btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Modify Engagement<span class="caret"></span></a>
+        <ul class="dropdown-menu scrollable-menu">
+          {% for engagement in engagements %}
+          <li><a name="remove-project" href="/admin/modify-engagement/{{ engagement.id }}">TORG - {{ engagement.client }} - {{ engagement.project }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </li>
+  </ul>
+</div>
+{% endblock %}
