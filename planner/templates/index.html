@@ -1,3 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
+<canvas id="utilization" width="400" height="400">
+<canvas id="revenue" width="400" height="400">
+<script type="text/javascript">
+  $(document).ready(function() {
+    app.utilization($('#utilization'));
+    app.revenue($('#revenue'));
+  });
+</script>
 {% endblock %}
