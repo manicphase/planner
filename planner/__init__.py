@@ -1,7 +1,10 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+import datetime
 
-from planner.model import LiveSession, Engagement
-from planner.form import NewEngagement, ModifyEngagement 
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
+
+from planner.form import NewEngagement
+from planner.model import Iteration, Engagement, ActualEngagementIteration, EstimatedEngagementIteration
+from planner.model.connect import LiveSession
 from config import SECRET_KEY
 
 
@@ -12,88 +15,65 @@ app.secret_key = SECRET_KEY
 
 @app.route('/')
 def index():
-    return render_template('index.html')
-
-
-@app.route('/admin')
-def admin():
     session = app.db()
+    iterations = session.query(Iteration).all()
     engagements = session.query(Engagement).all()
-    session.close()
-    return render_template('admin.html', engagements=engagements)
+
+    return render_template('index.html', iterations=iterations, engagements=engagements)
 
 
-@app.route('/admin/add-engagement', methods=['POST', 'GET'])
+@app.route('/add-engagement', methods=['POST', 'GET'])
 def add_engagement():
+    session = app.db()
     if request.method == 'POST':
         form = NewEngagement(request.form)
         if form.validate():
-            session = app.db()
-            try:
-                session.add(Engagement(teamid=form.team.data,
-                                       client=form.client.data,
-                                       project=form.project.data,
-                                       sowlink=form.sowlink.data,
-                                       probability=form.probability.data,
-                                       sustainability=form.sustainability.data,
-                                       alignment=form.alignment.data,
-                                       revenue=form.revenue.data,
-                                       status=form.status.data,
-                                       complexity=form.complexity.data,
-                                       type=form.type.data))
+            session.add(Engagement(teamid=1,
+                                   name=form.name.data,
+                                   client=form.client.data,
+                                   sowlink=form.sowlink.data,
+                                   probability=form.probability.data,
+                                   sustainability=form.sustainability.data,
+                                   alignment=form.alignment.data,
+                                   revenue=form.revenue.data,
+                                   status=form.status.data,
+                                   complexity=form.complexity.data,
+                                   isrnd=form.isrnd.data))
+            session.commit()
+            flash("Added engagement")
+            session.close()
 
-                session.commit()
-                flash("Successfully added engagement!")
-                return redirect(url_for('admin'))
-            except:
-                flash("Something went wrong")
-            finally:
-                session.close()
+            return redirect(url_for('index'))
         else:
-            flash("Form submission failed")
-    else:
-        form = NewEngagement()
-    return render_template('add-engagement.html', form=form)
+            flash("Invalid submission")
+            session.close()
+
+            return render_template('add-engagement.html', form=form)
+    session.close()
+
+    return render_template('add-engagement.html', form=NewEngagement())
 
 
-@app.route('/admin/modify-engagement/<engagementid>', methods=['POST', 'GET'])
-def modify_engagement(engagementid):
-    if request.method == 'POST':
-        form = ModifyEngagement(request.form)
-        if form.validate():
-            session = app.db()
-            try:
-                engagement = session.query(Engagement).filter_by(id=engagementid).first()
-                if form.team.data:
-                    engagement.teamid = form.team.data
-                if form.client.data:
-                    engagement.client = form.client.data
-                if form.project.data:
-                    engagement.project = form.project.data
-                if form.sowlink.data:
-                    engagement.sowlink = form.sowlink.data
-                if form.probability.data:
-                    engagement.probability = form.probability.data
-                if form.sustainability.data:
-                    engagement.sustainability = form.sustainability.data
-                if form.alignment.data:
-                    engagement.alignment = form.alignment.data
-                if form.revenue.data:
-                    engagement.revenue = form.revenue.data
-                if form.type.data:
-                    engagement.type = form.type.data
-                session.add(engagement)
-                session.commit()
-                flash("Successfully added engagement!")
-                return redirect(url_for('admin'))
-            except:
-                flash("Something went wrong")
-            finally:
-                session.close()
-        else:
-            flash("Form submission failed")
-    else:
-        form = ModifyEngagement()
-        form.engagementid = engagementid
-    return render_template('modify-engagement.html', form=form)
+@app.route('/api/schedule/iteration-for-engagement', methods=['POST'])
+def api_schedule_iteration_for_engagement():
+    data = request.get_json()
+    message = "FAIL"
+    session = app.db()
+    engagement = session.query(Engagement).filter_by(id=data['engagement']).first()
+    if data['status'] == 'removed':
+        session.execute(ActualEngagementIteration.delete().where('iterationid=%s and engagementid=%s' % (data['iteration'], data['engagement'])))
+        session.execute(EstimatedEngagementIteration.delete().where('iterationid=%s and engagementid=%s' % (data['iteration'], data['engagement'])))
+        message = jsonify(id="iter%s_eng%s" % (data['iteration'], data['engagement']), value=0, status='removed')
+    elif data['status'] == 'actual':
+        session.execute(EstimatedEngagementIteration.delete().where('iterationid=%s and engagementid=%s' % (data['iteration'], data['engagement'])))
+        session.execute(ActualEngagementIteration.insert().values(engagementid=data['engagement'], iterationid=data['iteration']))
+        message = jsonify(id="iter%s_eng%s" % (data['iteration'], data['engagement']), value=engagement.complexity, status='actual')
+    elif data['status'] == 'estimated':
+        session.execute(ActualEngagementIteration.delete().where('iterationid=%s and engagementid=%s' % (data['iteration'], data['engagement'])))
+        session.execute(EstimatedEngagementIteration.insert().values(engagementid=data['engagement'], iterationid=data['iteration']))
+        message = jsonify(id="iter%s_eng%s" % (data['iteration'], data['engagement']), value=engagement.probable_complexity(), status='estimated')
+    session.commit()
+    session.close()
+
+    return message
 
