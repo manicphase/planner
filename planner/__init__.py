@@ -15,11 +15,16 @@ app.secret_key = SECRET_KEY
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+
+@app.route('/schedule')
+def schedule():
     session = app.db()
     iterations = session.query(Iteration).all()
     engagements = session.query(Engagement).all()
 
-    return render_template('index.html', iterations=iterations, engagements=engagements)
+    return render_template('schedule.html', iterations=iterations, engagements=engagements)
 
 
 @app.route('/add-engagement', methods=['POST', 'GET'])

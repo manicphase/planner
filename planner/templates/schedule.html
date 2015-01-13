@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<small>
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Engagement</th>
+        {% for iteration in iterations %}
+        <th>{{ iteration.startdate }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for engagement in engagements %}
+      <tr>
+        <th scope="row">{{ engagement.client }} - {{ engagement.name }}</th>
+        {% for iteration in iterations %}
+        {% if iteration in engagement.actual %}
+        <td id="iter{{ iteration.id }}_eng{{ engagement.id }}" iteration="{{ iteration.id }}" engagement="{{ engagement.id }}" status="actual" onclick="schedule(event)">{{ engagement.complexity }}</td>
+        {% elif iteration in engagement.estimated %}
+        <td id="iter{{ iteration.id }}_eng{{ engagement.id }}" iteration="{{ iteration.id }}" engagement="{{ engagement.id }}" status="estimated"  onclick="schedule(event)">{{ engagement.probable_complexity() }}</td>
+        {% else %}
+        <td id="iter{{ iteration.id }}_eng{{ engagement.id }}" iteration="{{ iteration.id }}" engagement="{{ engagement.id }}"  status="removed" onclick="schedule(event)">0</td>
+        {% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+</table>
+</small>
+<script type="text/javascript">
+  var schedule = function(e) {
+      var source = $("#"+e.target.id);
+      var status = 'estimated';
+      if (source.attr('status') === 'actual') {
+        status = 'removed';
+      } else if (source.attr('status') === 'estimated') {
+        status = 'actual';
+      } 
+      $.ajax({type: "POST",
+              contentType: "application/json; charset=utf-8",
+              url: "{{ url_for('api_schedule_iteration_for_engagement') }}",
+              data: JSON.stringify({status: status, iteration: source.attr('iteration'), engagement: source.attr('engagement')}),
+              success: function(data) {
+                console.log(data);
+                $('#'+data['id']).text(data['value']);
+                $('#'+data['id']).attr('status', data['status']);
+              },
+              dataType: "json"});
+  }
+</script>
+{% endblock %}
