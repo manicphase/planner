@@ -31,5 +31,5 @@ def utilization(team, iterations, engagements):
                  'pointStrokeColor': "#fff",
                  'pointHighlightFill': "#fff",
                  'pointHighlightStroke': "rgba(220, 220, 220, 1)",
-                 'data': [sum([engagement.probable_complexity for engagement in engagements if iteration in engagement.actual or iteration in engagement.estimated]) / team.capacity for iteration in iterations]}]}
+                 'data': [sum([engagement.probable_complexity() for engagement in engagements if iteration in engagement.actual or iteration in engagement.estimated]) / team.capacity for iteration in iterations]}]}
 
