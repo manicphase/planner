@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from planner.model import Base
-from planner.config import LIVEDBPATH, TESTDBPATH
+from planner.config import LIVEDBPATH
 
 
 LiveSession = sessionmaker(bind=create_engine('sqlite:///' + LIVEDBPATH))

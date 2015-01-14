@@ -2,9 +2,9 @@ import datetime
 
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 
-from planner.logic import utilization, cost, revenue
+from planner.logic import utilization, finance
 from planner.form import NewEngagement
-from planner.model import Iteration, Engagement, ActualEngagementIteration, EstimatedEngagementIteration
+from planner.model import Team, Iteration, Engagement, ActualEngagementIteration, EstimatedEngagementIteration
 from planner.model.connect import LiveSession
 from config import SECRET_KEY
 
@@ -90,13 +90,11 @@ def api_data():
     message = "FAIL"
     session = app.db()
     team = session.query(Team).filter_by(id=data['team']).first()
-    iterations = session.query(Iteration).filter_by(startdate >= data['start'] and startdate <= data['end']).all()
-    engagements = iterations.actual + iterations.estimated
-    if data['set'] == 'cost':
-        message = jsonify(cost(team, iterations))
+    iterations = session.query(Iteration).all()  #TODO: filter by date range
+    engagements = team.engagements
+    if data['set'] == 'finance':
+        message = jsonify(finance(team, iterations, engagements)) 
     elif data['set'] == 'utilization':
         message = jsonify(utilization(team, iterations, engagements))
-    elif data['set'] == 'revenue':
-        message = jsonify(revenue(team, iterations, engagements))
 
     return message

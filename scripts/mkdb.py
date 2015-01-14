@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from planner.config import TORG, LIVEDBPATH
+from planner.config import TEAM, LIVEDBPATH
 from planner.model import Iteration
 from planner.model.connect import new_database, LiveSession
 
@@ -19,7 +19,7 @@ def static_live_data():
               date(2015, 10, 26), date(2015, 11, 9), date(2015, 11, 23),
               date(2015, 12, 7), date(2015, 12, 21)]:
         session.add(Iteration(startdate=d))
-        session.add(TORG)
+        session.add(TEAM)
         session.commit()
         session.close()
 

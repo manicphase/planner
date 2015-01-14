@@ -53,6 +53,6 @@ class Team(Base):
     revenuecap = Column(Integer, nullable=False)
     devmax = Column(Float, nullable=False)
     researchmax = Column(Float, nullable=False)
-
+    cost = Column(Integer, nullable=False)
     engagements = relationship('Engagement', backref='team')
 
