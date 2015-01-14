@@ -4,9 +4,10 @@ from planner.model import Team
 LIVEDBPATH = 'live.db'
 TESTDBPATH = 'test.db'
 SECRET_KEY = 'changeme'
-TORG = Team(name='TORG',
-            capacity=2.0,
-            revenuecap=360000,
-            devmax=0.4,
-            researchmax=0.1)
+TEAM = Team(name='CHANGEME',
+            capacity=0.0,
+            revenuecap=0,
+            devmax=0.0,
+            researchmax=0.0,
+            cost=0)
 
