@@ -3,3 +3,4 @@
 *.pyc
 torgplanner
 *.swp
+planner/config.py
