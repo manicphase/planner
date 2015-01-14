@@ -27,7 +27,6 @@ var app = (function(jquery, chartjs) {
         url: "/api/data",
         data: JSON.stringify({start: Date(2015, 1, 5), end: Date(2015, 12, 31), set: set, team: 1}),
         success: function(data) {
-          console.log(data);
           new chart(ctx).Line(data);
         },
         dataType: "json"}
