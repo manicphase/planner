@@ -12,7 +12,7 @@
 
   desc("Run Python Tests");
   task("testpy", [], function() {
-    syscmd("python -m unittest discover -s test -p _test_*.py").data(function(err, stdout, stderr) {
+    syscmd("python -m unittest discover -s test/python -p _test_*.py").data(function(err, stdout, stderr) {
       if (err) {
         console.log(stdout.toString());
         console.log(stderr.toString());

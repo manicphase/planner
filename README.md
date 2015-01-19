@@ -1,4 +1,5 @@
 # Planner
+[![Build Status](https://travis-ci.org/saltpy/planner.png)](https://travis-ci.org/saltpy/planner)
 
 Planning tool designed for agile teams working in iterations with third parties
 
