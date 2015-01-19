@@ -1,6 +1,10 @@
 from __future__ import division
 
 
+def revenue(engagement):
+    return engagement.revenue
+
+
 def finance(team, iterations, engagements):
     return {'labels': [str(iteration.startdate) for iteration in iterations],
             'datasets': [

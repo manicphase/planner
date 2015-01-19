@@ -3,4 +3,6 @@
 *.pyc
 torgplanner
 *.swp
-planner/config.py
+config.py
+node_modules
+*.log
