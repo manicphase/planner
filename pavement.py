@@ -1,6 +1,5 @@
 from paver.easy import task, sh, needs, Bunch, options
-from paver.virtual import bootstrap, virtualenv
-from paver.setuputils import setup
+from paver.virtual import virtualenv
 
 options(
     setup=dict(
@@ -16,7 +15,8 @@ options(
         test_suite="test"
     ),
     virtualenv=Bunch(
-        packages_to_install=['SQLAlchemy', 'Flask', 'wtforms', 'virtualenv', 'flake8'],
+        packages_to_install=['SQLAlchemy', 'Flask', 'wtforms', 'virtualenv',
+                             'flake8'],
         script_name='bootstrap.py',
         dest_dir='venv'
     )
@@ -24,13 +24,31 @@ options(
 
 
 @task
-def lint():
-    return sh('flake8 test planner pavement.py')
+@needs(['generate_setup', 'paver.virtual.bootstrap'])
+def once():
+    """Run once when you first start using this codebase
+    """
+    return sh('python bootstrap.py')
+
+
+@task
+def unit():
+    """Run unit tests
+    """
+    return sh("python -m unittest discover -s test -p _test_*.py")
 
 
 @task
 @virtualenv(dir="venv")
-@needs(['lint', 'test', 'clean'])
+def lint():
+    """Lint the python files
+    """
+    return sh('flake8 test planner pavement.py')
+
+
+@task
+@needs(['lint', 'unit'])
+@virtualenv(dir="venv")
 def ci():
     """Run the continuous integration pipeline
     """
@@ -39,6 +57,7 @@ def ci():
 
 @task
 def clean():
-    first = sh('rm -rf ./*.egg* venv build')
-    second = sh('find . -name "*.pyc" -delete')
-    return max([first, second])
+    """Clean up the build artifacts etc
+    """
+    return max([sh('rm -rf ./*.egg* build'),
+                sh('find . -name "*.pyc" -delete')])
