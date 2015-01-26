@@ -1,5 +1,8 @@
-from paver.easy import task, sh, needs, Bunch, options
+from paver.easy import options, task, needs, sh, Bunch
+from paver.setuputils import install_distutils_tasks
 from paver.virtual import virtualenv
+
+install_distutils_tasks()
 
 options(
     setup=dict(
@@ -24,7 +27,7 @@ options(
 
 
 @task
-@needs(['paver.virtual.bootstrap'])
+@needs(['minilib', 'generate_setup', 'paver.virtual.bootstrap'])
 def once():
     """Run once when you first start using this codebase
     """
@@ -61,3 +64,12 @@ def clean():
     """
     return max([sh('rm -rf venv bootstrap.py ./*.egg* build'),
                 sh('find . -name "*.pyc" -delete')])
+
+
+@task
+@needs(['paver.setuputils.develop', 'ci'])
+@virtualenv(dir="venv")
+def up():
+    """Start the server up
+    """
+    return sh("python planner")
