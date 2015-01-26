@@ -1,3 +1,5 @@
 include setup.py
 include pavement.py
 include paver-minilib.zip
+recursive-include planner/templates *
+recursive-include planner/static *
