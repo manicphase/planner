@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from datetime import date
+from os.path import exists
 
 from planner.config import TEAM, LIVEDBPATH
 from planner.model import Iteration
@@ -25,6 +26,7 @@ def static_live_data():
 
 
 if __name__ == '__main__':
-    new_database(LIVEDBPATH)
-    static_live_data()
+    if not exists(LIVEDBPATH):
+        new_database(LIVEDBPATH)
+        static_live_data()
     print "DB created"

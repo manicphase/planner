@@ -1,8 +1,5 @@
 from paver.easy import options, task, needs, sh, Bunch
-from paver.setuputils import install_distutils_tasks
 from paver.virtual import virtualenv
-
-install_distutils_tasks()
 
 options(
     setup=dict(
@@ -31,7 +28,6 @@ options(
 def once():
     """Run once when you first start using this codebase
     """
-    sh('python scripts/mkdb.py')
     return sh('python bootstrap.py')
 
 
@@ -68,7 +64,14 @@ def clean():
 
 
 @task
-@needs(['paver.setuputils.develop', 'ci'])
+@needs(['paver.setuputils.develop'])
+@virtualenv(dir="venv")
+def db():
+    return sh("python scripts/mkdb.py")
+
+
+@task
+@needs(['paver.setuputils.develop', 'ci', 'db'])
 @virtualenv(dir="venv")
 def up():
     """Start the server up
