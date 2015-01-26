@@ -10,7 +10,7 @@ var app = (function(jquery, chartjs) {
     jquery.ajax({
       type: "POST",
       contentType: "application/json; charset=utf-8",
-      url: "/api/schedule/iteration-for-engagement",
+      url: "api/schedule/iteration-for-engagement",
       data: JSON.stringify({status: status, iteration: source.attr('iteration'), engagement: source.attr('engagement')}),
       success: function(data) {
         jquery('#'+data['id']).text(data['value']);
@@ -24,7 +24,7 @@ var app = (function(jquery, chartjs) {
       jquery.ajax({
         type: "POST",
         contentType: "application/json; charset=utf-8",
-        url: "/api/data",
+        url: "api/data",
         data: JSON.stringify({start: Date(2015, 1, 5), end: Date(2015, 12, 31), set: set, team: 1}),
         success: function(data) {
           new chart(ctx).Line(data);
