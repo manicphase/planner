@@ -1,5 +1,5 @@
 language: python
 python:
   - "2.7"
-install: "pip install virtualenv && python setup.py once"
+install: "pip install paver virtualenv && paver once"
 script: "paver ci"

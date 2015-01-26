@@ -59,5 +59,5 @@ def ci():
 def clean():
     """Clean up the build artifacts etc
     """
-    return max([sh('rm -rf bootstrap.py ./*.egg* build'),
+    return max([sh('rm -rf venv bootstrap.py ./*.egg* build'),
                 sh('find . -name "*.pyc" -delete')])
