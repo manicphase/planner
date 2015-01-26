@@ -9,7 +9,7 @@ from planner.model.connect import new_database, LiveSession
 
 def static_live_data():
     session = LiveSession()
-    for  d in [date(2015, 1, 5), date(2015, 1, 19), date(2015, 2, 2),
+    for d in [date(2015, 1, 5), date(2015, 1, 19), date(2015, 2, 2),
               date(2015, 2, 16), date(2015, 3, 2), date(2015, 3, 16),
               date(2015, 3, 30), date(2015, 4, 13), date(2015, 4, 27),
               date(2015, 5, 11), date(2015, 5, 25), date(2015, 6, 8),
@@ -28,4 +28,3 @@ if __name__ == '__main__':
     new_database(LIVEDBPATH)
     static_live_data()
     print "DB created"
-

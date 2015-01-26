@@ -1,4 +1,5 @@
-from paver.easy import task, needs, sh 
+from paver.easy import task, sh, needs
+from paver.virtual import virtualenv
 from paver.setuputils import setup
 
 setup(
@@ -10,16 +11,24 @@ setup(
     author="James Salt",
     author_email="saltpy+planner@gmail.com",
     license="MIT",
-    tests_require=['flake8', 'virtualenv'],
-    test_suite='test'
+    tests_require=["virtualenv", "flake8"],
+    test_suite="test"
 )
 
+
 @task
-@needs(['flake8', 'test', 'clean'])
+def lint():
+    return sh('flake8 test planner pavement.py')
+
+
+@task
+@virtualenv(dir="venv")
+@needs(['lint', 'test', 'clean'])
 def ci():
     """Run the continuous integration pipeline
     """
     pass
+
 
 @task
 def clean():
