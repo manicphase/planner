@@ -24,7 +24,7 @@ options(
 
 
 @task
-@needs(['generate_setup', 'paver.virtual.bootstrap'])
+@needs(['paver.virtual.bootstrap'])
 def once():
     """Run once when you first start using this codebase
     """
@@ -59,5 +59,5 @@ def ci():
 def clean():
     """Clean up the build artifacts etc
     """
-    return max([sh('rm -rf ./*.egg* build'),
+    return max([sh('rm -rf bootstrap.py ./*.egg* build'),
                 sh('find . -name "*.pyc" -delete')])
