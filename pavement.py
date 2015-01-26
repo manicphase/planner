@@ -32,4 +32,4 @@ def ci():
 
 @task
 def clean():
-    sh('rm -rf ./*.egg*')
+    return sh('rm -rf ./*.egg*')
