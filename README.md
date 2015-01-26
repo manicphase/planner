@@ -7,3 +7,5 @@ TORG use this tool. You can find TORG at torg.thetestpeople.com.
 
 First run:
 pip install virtualenv paver && paver once && paver ci
+
+paver up

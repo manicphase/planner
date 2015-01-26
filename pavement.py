@@ -31,6 +31,7 @@ options(
 def once():
     """Run once when you first start using this codebase
     """
+    sh('python scripts/mkdb.py')
     return sh('python bootstrap.py')
 
 
