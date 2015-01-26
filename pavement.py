@@ -1,5 +1,8 @@
 from paver.easy import options, task, needs, sh, Bunch
+from paver.setuputils import install_distutils_tasks
 from paver.virtual import virtualenv
+
+install_distutils_tasks()
 
 options(
     setup=dict(
