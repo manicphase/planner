@@ -10,4 +10,3 @@ TEAM = Team(name='CHANGEME',
             devmax=0.0,
             researchmax=0.0,
             cost=0)
-

@@ -2,7 +2,6 @@ import sqlite3
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 
 from planner.model import Base
 from planner.config import LIVEDBPATH
@@ -16,4 +15,3 @@ def new_database(fname):
     conn.close()
     engine = create_engine('sqlite:///' + fname)
     Base.metadata.create_all(engine)
-

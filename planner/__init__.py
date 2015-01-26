@@ -1,10 +1,13 @@
-import datetime
-
-from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
+from flask import (
+    Flask, render_template, redirect, url_for, request, flash, jsonify
+)
 
 from planner.logic import utilization, finance
 from planner.form import NewEngagement
-from planner.model import Team, Iteration, Engagement, ActualEngagementIteration, EstimatedEngagementIteration
+from planner.model import (
+    Team, Iteration, Engagement, ActualEngagementIteration,
+    EstimatedEngagementIteration
+)
 from planner.model.connect import LiveSession
 from config import SECRET_KEY
 
@@ -25,7 +28,8 @@ def schedule():
     iterations = session.query(Iteration).all()
     engagements = session.query(Engagement).all()
 
-    return render_template('schedule.html', iterations=iterations, engagements=engagements)
+    return render_template('schedule.html',
+                           iterations=iterations, engagements=engagements)
 
 
 @app.route('/add-engagement', methods=['POST', 'GET'])
@@ -65,19 +69,35 @@ def api_schedule_iteration_for_engagement():
     data = request.get_json()
     message = "FAIL"
     session = app.db()
-    engagement = session.query(Engagement).filter_by(id=data['engagement']).first()
+    engagement = session.query(Engagement).filter_by(
+        id=data['engagement']).first()
     if data['status'] == 'removed':
-        session.execute(ActualEngagementIteration.delete().where('iterationid=%s and engagementid=%s' % (data['iteration'], data['engagement'])))
-        session.execute(EstimatedEngagementIteration.delete().where('iterationid=%s and engagementid=%s' % (data['iteration'], data['engagement'])))
-        message = jsonify(id="iter%s_eng%s" % (data['iteration'], data['engagement']), value=0, status='removed')
+        session.execute(ActualEngagementIteration.delete().where(
+            'iterationid=%s and engagementid=%s' % (data['iteration'],
+                                                    data['engagement'])))
+        session.execute(EstimatedEngagementIteration.delete().where(
+            'iterationid=%s and engagementid=%s' % (data['iteration'],
+                                                    data['engagement'])))
+        message = jsonify(id="iter%s_eng%s" % (
+            data['iteration'], data['engagement']), value=0, status='removed')
     elif data['status'] == 'actual':
-        session.execute(EstimatedEngagementIteration.delete().where('iterationid=%s and engagementid=%s' % (data['iteration'], data['engagement'])))
-        session.execute(ActualEngagementIteration.insert().values(engagementid=data['engagement'], iterationid=data['iteration']))
-        message = jsonify(id="iter%s_eng%s" % (data['iteration'], data['engagement']), value=engagement.complexity, status='actual')
+        session.execute(EstimatedEngagementIteration.delete().where(
+            'iterationid=%s and engagementid=%s' % (data['iteration'],
+                                                    data['engagement'])))
+        session.execute(ActualEngagementIteration.insert().values(
+            engagementid=data['engagement'], iterationid=data['iteration']))
+        message = jsonify(id="iter%s_eng%s" % (
+            data['iteration'], data['engagement']),
+            value=engagement.complexity, status='actual')
     elif data['status'] == 'estimated':
-        session.execute(ActualEngagementIteration.delete().where('iterationid=%s and engagementid=%s' % (data['iteration'], data['engagement'])))
-        session.execute(EstimatedEngagementIteration.insert().values(engagementid=data['engagement'], iterationid=data['iteration']))
-        message = jsonify(id="iter%s_eng%s" % (data['iteration'], data['engagement']), value=engagement.probable_complexity(), status='estimated')
+        session.execute(ActualEngagementIteration.delete().where(
+            'iterationid=%s and engagementid=%s' % (data['iteration'],
+                                                    data['engagement'])))
+        session.execute(EstimatedEngagementIteration.insert().values(
+            engagementid=data['engagement'], iterationid=data['iteration']))
+        message = jsonify(id="iter%s_eng%s" % (
+            data['iteration'], data['engagement']),
+            value=engagement.probable_complexity(), status='estimated')
     session.commit()
     session.close()
 
@@ -90,10 +110,10 @@ def api_data():
     message = "FAIL"
     session = app.db()
     team = session.query(Team).filter_by(id=data['team']).first()
-    iterations = session.query(Iteration).all()  #TODO: filter by date range
+    iterations = session.query(Iteration).all()  # TODO: filter by date range
     engagements = team.engagements
     if data['set'] == 'finance':
-        message = jsonify(finance(team, iterations, engagements)) 
+        message = jsonify(finance(team, iterations, engagements))
     elif data['set'] == 'utilization':
         message = jsonify(utilization(team, iterations, engagements))
 

@@ -23,7 +23,13 @@ def finance(team, iterations, engagements):
                  'pointStrokeColor': "#fff",
                  'pointHighlightFill': "#fff",
                  'pointHighlightStroke': "rgba(0, 255, 0, 1)",
-                 'data':[sum([engagement.revenue * float(engagement.probability) for engagement in engagements if iteration in engagement.actual or iteration in engagement.estimated]) for iteration in iterations]}]}
+                 'data': [sum([engagement.revenue *
+                               float(engagement.probability)
+                               for engagement in engagements
+                               if iteration in engagement.actual
+                               or iteration in engagement.estimated])
+                          for iteration in iterations]}]}
+
 
 def utilization(team, iterations, engagements):
     return {'labels': [str(iteration.startdate) for iteration in iterations],
@@ -35,5 +41,8 @@ def utilization(team, iterations, engagements):
                  'pointStrokeColor': "#fff",
                  'pointHighlightFill': "#fff",
                  'pointHighlightStroke': "rgba(220, 220, 220, 1)",
-                 'data': [sum([engagement.probable_complexity() for engagement in engagements if iteration in engagement.actual or iteration in engagement.estimated]) / team.capacity for iteration in iterations]}]}
-
+                 'data': [sum([engagement.probable_complexity()
+                               for engagement in engagements
+                               if iteration in engagement.actual
+                               or iteration in engagement.estimated])
+                          / team.capacity for iteration in iterations]}]}

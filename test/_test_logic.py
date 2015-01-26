@@ -1,7 +1,7 @@
 import unittest
 
 from planner.logic import revenue
-from test.python.stubs import StubIteration, StubEngagement
+from test.stubs import StubIteration, StubEngagement
 
 
 class TestLogic(unittest.TestCase):

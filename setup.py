@@ -1,9 +1,10 @@
-from setuptools import setup, find_packages
+try:
+    import paver.tasks
+except ImportError:
+    from os.path import exists
+    if exists("paver-minilib.zip"):
+        import sys
+        sys.path.insert(0, "paver-minilib.zip")
+    import paver.tasks
 
-setup(
-    name='Planner',
-    version='0.0.0',
-    packages=find_packages(),
-    include_package_data=True,
-    install_requires=['SQLAlchemy', 'Flask', 'wtforms']
-)
+paver.tasks.main()
