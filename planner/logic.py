@@ -2,7 +2,9 @@ from __future__ import division
 
 
 def revenue(engagement):
-    return engagement.revenue
+    prev = engagement.revenue * engagement.probability
+    rev = engagement.revenue
+    return (prev * len(engagement.estimated)) + (rev * len(engagement.actual))
 
 
 def finance(team, iterations, engagements):
