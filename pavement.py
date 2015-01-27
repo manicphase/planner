@@ -1,3 +1,5 @@
+from os.path import exists
+
 from paver.easy import options, task, needs, sh, Bunch
 from paver.setuputils import install_distutils_tasks
 from paver.virtual import virtualenv
@@ -10,20 +12,26 @@ options(
         version='0.0.0',
         packages=['planner'],
         include_package_data=True,
-        install_requires=['SQLAlchemy', 'Flask', 'wtforms'],
         author="James Salt",
         author_email="saltpy+planner@gmail.com",
-        license="MIT",
-        tests_require=["virtualenv", "flake8"],
-        test_suite="test"
+        license="MIT"
     ),
     virtualenv=Bunch(
         packages_to_install=['SQLAlchemy', 'Flask', 'wtforms', 'virtualenv',
-                             'flake8'],
+                             'flake8', 'ipython'],
         script_name='bootstrap.py',
         dest_dir='venv'
     )
 )
+
+
+@task
+@needs(['paver.setuputils.develop', 'db'])
+@virtualenv(dir='venv')
+def dbrepl():
+    """Open ipython with session to live db
+    """
+    sh('ipython -i scripts/dbrepl.py')
 
 
 @task
@@ -35,6 +43,8 @@ def once():
 
 
 @task
+@needs(['paver.setuputils.develop'])
+@virtualenv(dir="venv")
 def unit():
     """Run unit tests
     """
@@ -70,7 +80,9 @@ def clean():
 @needs(['paver.setuputils.develop'])
 @virtualenv(dir="venv")
 def db():
-    return sh("python scripts/mkdb.py")
+    from planner.config import LIVEDBPATH
+    if not exists(LIVEDBPATH):
+        sh("python scripts/mkdb.py")
 
 
 @task
