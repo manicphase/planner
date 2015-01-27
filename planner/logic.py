@@ -2,9 +2,14 @@ from __future__ import division
 
 
 def revenue(engagement):
-    prev = engagement.revenue * engagement.probability
+    rndrev = engagement.team.cost * 0.25 if engagement.isrnd else 0
+    prndrev = rndrev * engagement.probability
     rev = engagement.revenue
-    return (prev * len(engagement.estimated)) + (rev * len(engagement.actual))
+    prev = rev * engagement.probability
+    return sum([prev * len(engagement.estimated),
+                rev * len(engagement.actual),
+                rndrev * len(engagement.actual),
+                prndrev * len(engagement.estimated)])
 
 
 def finance(team, iterations, engagements):
