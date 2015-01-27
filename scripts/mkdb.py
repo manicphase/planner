@@ -3,7 +3,10 @@
 from datetime import date
 from os.path import exists
 
-from planner.config import TEAM, LIVEDBPATH
+from planner.config import (
+    TEAM_NAME, TEAM_CAPACITY, TEAM_REVENUE_CAP, TEAM_DEVMAX, TEAM_RESEARCH_MAX,
+    TEAM_COST, LIVEDBPATH
+)
 from planner.model import Iteration
 from planner.model.connect import new_database, LiveSession
 
@@ -20,7 +23,10 @@ def static_live_data():
               date(2015, 10, 26), date(2015, 11, 9), date(2015, 11, 23),
               date(2015, 12, 7), date(2015, 12, 21)]:
         session.add(Iteration(startdate=d))
-        session.add(TEAM)
+        session.add(Team(name=TEAM_NAME, cost=TEAM_COST,
+                         capacity=TEAM_CAPACITY, devmax=TEAM_DEVMAX,
+                         researchmax=TEAM_RESEARCH_MAX,
+                         revenuecap=TEAM_REVENUE_CAP)
         session.commit()
         session.close()
 

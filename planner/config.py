@@ -1,11 +1,9 @@
-from planner.model import Team
-
-
 LIVEDBPATH = 'live.db'
 SECRET_KEY = 'changeme'
-TEAM = Team(name='CHANGEME',
-            capacity=0.0,
-            revenuecap=0,
-            devmax=0.0,
-            researchmax=0.0,
-            cost=0)
+TEAM_NAME = 'CHANGEME'
+TEAM_CAPACITY = 0.0
+TEAM_REVENUE_CAP = 0
+TEAM_DEVMAX = 0.0
+TEAM_RESEARCH_MAX = 0.0
+TEAM_COST = 0
+RND_TAX_CREDIT = 0.25

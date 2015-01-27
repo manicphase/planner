@@ -1,15 +1,41 @@
 from __future__ import division
 
+from planner.config import RND_TAX_CREDIT
 
-def revenue(engagement):
-    rndrev = engagement.team.cost * 0.25 if engagement.isrnd else 0
-    prndrev = rndrev * engagement.probability
-    rev = engagement.revenue
-    prev = rev * engagement.probability
-    return sum([prev * len(engagement.estimated),
-                rev * len(engagement.actual),
-                rndrev * len(engagement.actual),
-                prndrev * len(engagement.estimated)])
+
+__all__ = ['revenue', 'finance', 'utilization']
+
+
+def certain_rnd_revenue(e):
+    return e.team.cost * RND_TAX_CREDIT if e.isrnd else 0.0
+
+
+def certain_iteration_revenue(e):
+    return e.revenue + certain_rnd_revenue(e)
+
+
+def probable_iteration_revenue(e):
+    return certain_iteration_revenue(e) * e.probability
+
+
+def certain_iterations(e):
+    return len(e.actual)
+
+
+def probable_iterations(e):
+    return len(e.estimated)
+
+
+def certain_engagement_revenue(e):
+    return certain_iteration_revenue(e) * certain_iterations(e)
+
+
+def probable_engagement_revenue(e):
+    return probable_iteration_revenue(e) * probable_iterations(e)
+
+
+def revenue(e):
+    return certain_engagement_revenue(e) + probable_iteration_revenue(e)
 
 
 def finance(team, iterations, engagements):
