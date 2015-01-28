@@ -51,6 +51,14 @@ class Engagement(Base):
     def probable_complexity(self):
         return float(self.complexity) * float(self.probability)
 
+    def __str__(self):
+        return '<Engagement name=%s, client=%s, team=%s, complexity=%s,\
+                probability=%s, sustainability=%s, alignment=%s, revenue=%s,\
+                status=%s, sowlink=%s, isrnd=%s>' % (
+            self.name, self.client, str(self.team), self.complexity,
+            self.probability, self.sustainability, self.alignment,
+            self.revenue, self.status, self.sowlink, self.isrnd)
+
 
 class Iteration(Base):
     __tablename__ = 'Iteration'
