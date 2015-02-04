@@ -3,10 +3,10 @@ from flask import (
 )
 
 from planner.logic import utilization, finance
-from planner.form import NewEngagement
+from planner.form import NewEngagement, NewContact
 from planner.model import (
     Team, Iteration, Engagement, ActualEngagementIteration,
-    EstimatedEngagementIteration
+    EstimatedEngagementIteration, Contact
 )
 from planner.model.connect import LiveSession
 from config import SECRET_KEY
@@ -118,3 +118,55 @@ def api_data():
         message = jsonify(utilization(team, iterations, engagements))
 
     return message
+
+
+@app.route('/clients')
+def clients():
+    # TODO: Swap link from to client when created, naming page 'clients.html'
+    session = app.db()
+    engagements = session.query(Engagement).all()
+    return render_template("clients.html", clients=engagements)
+
+
+@app.route('/clients/<client_id>')
+def contact_sheet(client_id):
+    session = app.db()
+    c = session.query(Contact).join(Engagement).filter_by(id=client_id)
+    return render_template("contacts.html", clients=c, client_id=client_id)
+
+
+@app.route('/clients/<client_id>/new', methods=['POST', 'GET'])
+def add_contact(client_id):  # TODO: Not expose client ids
+    if request.method == "GET":
+        return render_template(
+            'add-contact.html',
+            form=NewContact(),
+            client_id=client_id
+            )
+    if request.method == "POST":
+        session = app.db()
+        form = NewContact(request.form)
+        if form.validate():
+            session.add(Contact(forename=form.forename.data,
+                                surname=form.surname.data,
+                                email=form.email.data,
+                                landlinenumber=form.landline.data,
+                                role=form.role.data,
+                                address=form.address.data,
+                                mobilenumber=form.mobile.data,
+                                client=client_id
+                                ))
+            session.commit()
+            flash("Added Contact")
+            session.close()
+
+            return redirect(url_for('clients'))
+        else:
+            flash("Invalid submission")
+            session.close()
+
+            return render_template(
+                'add-contact.html',
+                form=form,
+                client_id=client_id
+                )
