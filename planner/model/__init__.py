@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Table, Column, Float, Integer, Text, ForeignKey, Date, Enum, Boolean
+    Column, Float, Integer, Text, ForeignKey, Date, Boolean
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,57 +7,84 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-EstimatedEngagementIteration = Table(
-    'EstimatedEngagementIteration',
-    Base.metadata,
-    Column('engagementid', Integer, ForeignKey('Engagement.id')),
-    Column('iterationid', Integer, ForeignKey('Iteration.id')))
 
-ActualEngagementIteration = Table(
-    'ActualEngagementIteration', Base.metadata,
-    Column('engagementid', Integer, ForeignKey('Engagement.id')),
-    Column('iterationid', Integer, ForeignKey('Iteration.id')))
+class ActualEngagementIteration(Base):
+    __tablename__ = 'ActualEngagementIteration'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    engagementid = Column(Integer, ForeignKey('Engagement.id'))
+    iterationid = Column(Integer, ForeignKey('Iteration.id'))
 
-FreeEngagementIteration = Table(
-    'FreeEngagementIteration', Base.metadata,
-    Column('engagementid', Integer, ForeignKey('Engagement.id')),
-    Column('iterationid', Integer, ForeignKey('Iteration.id')))
+
+class EstimatedEngagementIteration(Base):
+    __tablename__ = 'EstimatedEngagementIteration'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    engagementid = Column(Integer, ForeignKey('Engagement.id'))
+    iterationid = Column(Integer, ForeignKey('Iteration.id'))
 
 
 class Engagement(Base):
     __tablename__ = 'Engagement'
     id = Column(Integer, autoincrement=True, primary_key=True)
-    teamid = Column(Integer, ForeignKey('Team.id'), default=1)
     name = Column(Text, nullable=False)
-    complexity = Column(Enum('0.1', '0.5', '1.0', '2.0',
-                             name='engagementcomplexity'), nullable=False)
-    client = Column(Text, nullable=False)
-    sowlink = Column(Text, nullable=False)
-    probability = Column(Enum('0.0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6',
-                              '0.7', '0.8', '0.9', '1.0',
-                              name='engagementprobability'), nullable=False)
-    sustainability = Column(Enum('0.1', '0.2', '0.3', '0.4', '0.5', '0.6',
-                                 '0.7', '0.8', '0.9', '1.0',
-                                 name='engagementsustainability'),
-                            nullable=False)
-    alignment = Column(Enum('0.0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6',
-                            '0.7', '0.8', '0.9', '1.0',
-                            name='engagementalignment'), nullable=False)
+    proposal = Column(Text, nullable=False)
+    backlog = Column(Text, nullable=False)
     revenue = Column(Integer, nullable=False)
     isrnd = Column(Boolean, nullable=False)
-    status = Column(Enum('Complete', 'Sold', 'Negotiation', 'Approach', 'Lost',
-                         name='engagementstatus'), nullable=False)
 
-    def probable_complexity(self):
-        return float(self.complexity) * float(self.probability)
+    teamid = Column(Integer, ForeignKey('Team.id'), default=1)
+    clientid = Column(Integer, ForeignKey('Client.id'))
+    statusid = Column(Integer, ForeignKey('EngagementStatus.id'))
+    complexityid = Column(Integer, ForeignKey('EngagementComplexity.id'))
+    probabilityid = Column(Integer, ForeignKey('EngagementProbability.id'))
+    sustainabilityid = Column(Integer,
+                              ForeignKey('EngagementSustainability.id'))
+    alignmentid = Column(Integer, ForeignKey('EngagementAlignment.id'))
 
-    def __str__(self):
-        return '<Engagement name=%s, client=%s, team=%s, complexity=%s,\
-                probability=%s, sustainability=%s, alignment=%s, revenue=%s,\
-                status=%s, sowlink=%s, isrnd=%s>' % (
-            self.name, self.client, str(self.team), self.complexity,
-            self.probability, self.sustainability, self.alignment,
-            self.revenue, self.status, self.sowlink, self.isrnd)
+
+class Client(Base):
+    __tablename__ = 'Client'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    name = Column(Text, nullable=False, unique=True)
+    engagements = relationship("Engagement", backref="client")
+
+
+class EngagementStatus(Base):
+    __tablename__ = 'EngagementStatus'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    name = Column(Text, nullable=False, unique=True)
+    engagements = relationship("Engagement", backref="status")
+
+
+class EngagementAlignment(Base):
+    __tablename__ = 'EngagementAlignment'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    value = Column(Float, nullable=False, unique=True)
+    name = Column(Text, nullable=False, unique=True)
+    engagements = relationship("Engagement", backref='alignment')
+
+
+class EngagementSustainability(Base):
+    __tablename__ = 'EngagementSustainability'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    value = Column(Float, nullable=False, unique=True)
+    name = Column(Text, nullable=False, unique=True)
+    engagements = relationship("Engagement", backref='sustainability')
+
+
+class EngagementProbability(Base):
+    __tablename__ = 'EngagementProbability'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    value = Column(Float, nullable=False, unique=True)
+    engagements = relationship("Engagement", backref='probability')
+
+
+class EngagementComplexity(Base):
+    __tablename__ = 'EngagementComplexity'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    value = Column(Float, nullable=False, unique=True)
+    name = Column(Text, nullable=False, unique=True)
+    guide_revenue = Column(Integer)
+    engagements = relationship("Engagement", backref='complexity')
 
 
 class Iteration(Base):
@@ -79,5 +106,12 @@ class Team(Base):
     revenuecap = Column(Integer, nullable=False)
     devmax = Column(Float, nullable=False)
     researchmax = Column(Float, nullable=False)
-    cost = Column(Integer, nullable=False)
     engagements = relationship('Engagement', backref='team')
+    cost = relationship('TeamCost', backref='team')
+
+
+class TeamCost(Base):
+    __tablename__ = 'TeamCost'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    value = Column(Integer)
+    iterationid = Column(Integer, ForeignKey('Iteration.id'))
