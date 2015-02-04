@@ -47,6 +47,7 @@ class Engagement(Base):
     isrnd = Column(Boolean, nullable=False)
     status = Column(Enum('Complete', 'Sold', 'Negotiation', 'Approach', 'Lost',
                          name='engagementstatus'), nullable=False)
+    contacts = relationship("Contact")
 
     def probable_complexity(self):
         return float(self.complexity) * float(self.probability)
@@ -73,3 +74,17 @@ class Team(Base):
     researchmax = Column(Float, nullable=False)
     cost = Column(Integer, nullable=False)
     engagements = relationship('Engagement', backref='team')
+
+
+class Contact(Base):
+    __tablename__ = 'Contact'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    forename = Column(Text, nullable=False)
+    surname = Column(Text, nullable=False)
+    role = Column(Text)
+    email = Column(Text)
+    landlinenumber = Column(Text)
+    mobilenumber = Column(Text)
+    address = Column(Text)
+    client = Column(Integer, ForeignKey('Engagement.id'))
+    # TODO: Swap in client table

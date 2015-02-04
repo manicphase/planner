@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>Contacts</th>
+      </tr>
+    </thead>
+    <tbody id="clients">
+      {% for client in clients %}
+      <tr>
+        <th scope="row">{{ client.client }}</th>
+        <td id="iter{client.id}" client="{{ client.client }} ">
+          <a href="/clients/{{client.id}}">Contact List</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
