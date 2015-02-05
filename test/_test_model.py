@@ -25,13 +25,24 @@ class TestClient(ModelTestCase):
                 db.add(Client(name=None))
 
     def test_clients_name_should_be_unique(self):
-        pass
+        with self.transaction() as db:
+            db.add(Client(name="TestClient"))
+
+        with self.assertRaises(IntegrityError):
+            with self.transaction() as db:
+                db.add(Client(name="TestClient"))
 
     def test_client_should_have_engagements(self):
         pass
 
     def test_client_engagements_can_be_empty(self):
-        pass
+        with self.transaction() as db:
+            db.add(Client(name="TestClient"))
+
+        with self.transaction() as db:
+            actual = db.query(Client).first().engagements
+
+        self.assertEquals(0, len(actual))
 
     def test_client_to_dict_should_be_accurate(self):
         pass
