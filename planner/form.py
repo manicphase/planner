@@ -1,5 +1,12 @@
-from wtforms import Form, BooleanField, StringField, IntegerField, SelectField
-from wtforms.validators import DataRequired
+from wtforms import (
+    Form,
+    BooleanField,
+    StringField,
+    IntegerField,
+    SelectField,
+    TextAreaField
+    )
+from wtforms.validators import DataRequired, Email
 
 
 class NewEngagement(Form):
@@ -48,3 +55,14 @@ class NewEngagement(Form):
                              coerce=str,
                              validators=[DataRequired()])
     isrnd = BooleanField(u'Eligable for R&D tax credits?')
+
+
+class NewContact(Form):
+    # TODO: More validation
+    forename = StringField(u'* Forename', validators=[DataRequired()])
+    surname = StringField(u'* Surname', validators=[DataRequired()])
+    role = StringField(u'* Role')
+    email = StringField(u'* Email', validators=[Email()])
+    landline = StringField(u'* Landline')
+    mobile = StringField(u'* Mobile')
+    address = TextAreaField(u'* Address')

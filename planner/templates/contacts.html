@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% for client in clients|slice(1)%}
+  <h2>{{client.name}} Contacts</h2>
+  {% endfor %}
+  </br>
+  <div>
+    <a href="/clients/{{client_id}}/new">Add a contact</a>
+  </div>
+  </br>
+  <div class="container">
+    <div class="row">
+    {% for client in clients %}
+      <div class="col-xs-12 col-lg-4 top-buffer">
+        <p><b>Forename: </b>{{client.forename}}</p>
+        <p><b>Surname: </b>{{client.surname}}</p>
+        <p><b>Role: </b>{{client.role}}</p>
+        <p><b>Email: </b><a href="mailto:{{client.email}}">{{client.email}}</a></p>
+        <p><b>Mobile: </b><a href="tel:{{client.mobilenumber}}">{{client.mobilenumber}}</a></p>
+        <p><b>Landline: </b><a href="tel:{{client.landlinenumber}}">{{client.landlinenumber}}</a></p>
+        <p><b>Address: </b><a href="https://maps.google.com?q={{client.address}}">{{client.address|replace("\n", "<br>")|safe}}</a></p>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+{% endblock %}

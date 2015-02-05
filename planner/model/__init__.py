@@ -37,7 +37,6 @@ class Engagement(Base):
     backlog = Column(Text, nullable=False)
     revenue = Column(Integer, nullable=False)
     isrnd = Column(Boolean, nullable=False)
-
     teamid = Column(Integer, ForeignKey('Team.id'), default=1)
     clientid = Column(Integer, ForeignKey('Client.id'))
     statusid = Column(Integer, ForeignKey('EngagementStatus.id'))
@@ -53,6 +52,7 @@ class Client(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
     engagements = relationship("Engagement", backref="client")
+    contacts = relationship("Contact")
 
 
 class EngagementStatus(Base):
@@ -82,6 +82,7 @@ class EngagementProbability(Base):
     __tablename__ = 'EngagementProbability'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
+    name = Column(Text, nullable=False, unique=True)
     engagements = relationship("Engagement", backref='probability')
 
 
@@ -116,10 +117,23 @@ class Team(Base):
     engagements = relationship('Engagement', backref='team')
 
 
+class Contact(Base):
+    __tablename__ = 'Contact'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    forename = Column(Text, nullable=False)
+    surname = Column(Text, nullable=False)
+    role = Column(Text)
+    email = Column(Text)
+    landlinenumber = Column(Text)
+    mobilenumber = Column(Text)
+    address = Column(Text)
+    client = Column(Integer, ForeignKey('Client.id'))
+    # TODO: Swap in client table
+
+
 class TeamCost(Base):
     __tablename__ = 'TeamCost'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Integer)
     iterationid = Column(Integer, ForeignKey('Iteration.id'))
-    teamid = Column(Integer, ForeignKey('Team.id'))
     team = relationship("Team", secondary="TeamIterationCost", backref="cost")

@@ -2,3 +2,11 @@ canvas {
   width: 100%;
   height: auto;
 }
+
+.top-buffer {
+  margin-top: 30px;
+}
+
+textarea.form-control {
+     height: 150px;
+}
