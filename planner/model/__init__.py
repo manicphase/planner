@@ -92,6 +92,7 @@ class Client(Api, Base):
 
 
 class EngagementStatus(Api, Base):
+    __apifields__ = ['name', 'engagements']
     __tablename__ = 'EngagementStatus'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
@@ -99,6 +100,7 @@ class EngagementStatus(Api, Base):
 
 
 class EngagementAlignment(Api, Base):
+    __apifields__ = ['value', 'name', 'engagements']
     __tablename__ = 'EngagementAlignment'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
@@ -107,6 +109,7 @@ class EngagementAlignment(Api, Base):
 
 
 class EngagementSustainability(Api, Base):
+    __apifields__ = ['value', 'name', 'engagements']
     __tablename__ = 'EngagementSustainability'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
@@ -115,6 +118,7 @@ class EngagementSustainability(Api, Base):
 
 
 class EngagementProbability(Api, Base):
+    __apifields__ = ['value', 'name', 'engagements']
     __tablename__ = 'EngagementProbability'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
@@ -123,6 +127,7 @@ class EngagementProbability(Api, Base):
 
 
 class EngagementComplexity(Api, Base):
+    __apifields__ = ['value', 'name', 'guide_revenue', 'engagements']
     __tablename__ = 'EngagementComplexity'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
@@ -132,6 +137,7 @@ class EngagementComplexity(Api, Base):
 
 
 class Iteration(Api, Base):
+    __apifields__ = ['startdate', 'actual', 'estimated']
     __tablename__ = 'Iteration'
     id = Column(Integer, autoincrement=True, primary_key=True)
     startdate = Column(Date, nullable=False)
@@ -143,6 +149,8 @@ class Iteration(Api, Base):
 
 
 class Team(Api, Base):
+    __apifields__ = ['name', 'capacity', 'revenuecap', 'devmax', 'researchmax',
+                     'engagements']
     __tablename__ = 'Team'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False)
@@ -154,6 +162,8 @@ class Team(Api, Base):
 
 
 class Contact(Api, Base):
+    __apifields__ = ['forename', 'surname', 'role', 'email', 'landlinenumber',
+                     'mobilenumber', 'address', 'client']
     __tablename__ = 'Contact'
     id = Column(Integer, autoincrement=True, primary_key=True)
     forename = Column(Text, nullable=False)
@@ -167,8 +177,10 @@ class Contact(Api, Base):
 
 
 class TeamCost(Api, Base):
+    __apifields__ = ['value', 'team', 'iteration']
     __tablename__ = 'TeamCost'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Integer)
     iterationid = Column(Integer, ForeignKey('Iteration.id'))
+    iteration = relationship("Iteration")
     team = relationship("Team", secondary="TeamIterationCost", backref="cost")
