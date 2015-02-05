@@ -1,4 +1,5 @@
 import unittest
+from collections import OrderedDict
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
@@ -54,7 +55,13 @@ class TestClient(ModelTestCase):
         self.assertEquals(0, len(actual))
 
     def test_client_to_dict_should_be_accurate(self):
-        pass
+        expected = OrderedDict()
+        expected['entity'] = "Client"
+        expected['name'] = "TestClient"
+        expected['engagements'] = []
+        client = Client(name="TestClient")
+
+        self.assertEquals(expected, client.to_dict())
 
     def test_client_to_dict_should_call_engagements_to_dict(self):
         pass

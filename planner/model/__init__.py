@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from sqlalchemy import (
     Column, Float, Integer, Text, ForeignKey, Date, Boolean, Table
 )
@@ -61,6 +63,13 @@ class Client(Api, Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
     engagements = relationship("Engagement", backref="client")
+
+    def to_dict(self):
+        d = OrderedDict()
+        d['entity'] = Client.__tablename__
+        d['name'] = self.name
+        d['engagements'] = [e.to_dict() for e in self.engagements]
+        return d
 
 
 class EngagementStatus(Api, Base):
