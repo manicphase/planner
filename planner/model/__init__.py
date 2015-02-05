@@ -35,8 +35,13 @@ class Api(object):
     def to_dict(self):
         raise NotImplementedError
 
-    def from_dict(self):
+    @staticmethod
+    def from_dict(data):
         raise NotImplementedError
+
+
+class EntityTranslationError(Exception):
+    pass
 
 
 class Engagement(Api, Base):
@@ -70,6 +75,24 @@ class Client(Api, Base):
         d['name'] = self.name
         d['engagements'] = [e.to_dict() for e in self.engagements]
         return d
+
+    @staticmethod
+    def from_dict(data):
+        if data['entity'] != Client.__tablename__:
+            raise EntityTranslationError
+
+        try:
+            client = Client(name=data['name'], engagements=data['engagements'])
+        except KeyError:
+            raise EntityTranslationError
+
+        return client
+
+    def __eq__(self, other):
+        try:
+            return self.to_dict() == other.to_dict()
+        except:
+            return False
 
 
 class EngagementStatus(Api, Base):

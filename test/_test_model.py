@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 
-from planner.model import Base, Client, Engagement
+from planner.model import EntityTranslationError, Base, Client, Engagement
 from planner.model.connect import transaction
 
 
@@ -67,7 +67,21 @@ class TestClient(ModelTestCase):
         pass
 
     def test_client_from_dict_should_be_accurate(self):
-        pass
+        expected = Client(name="TestClient")
+        data = OrderedDict()
+        data['entity'] = "Client"
+        data['name'] = "TestClient"
+        data['engagements'] = []
+
+        self.assertEquals(expected, Client.from_dict(data))
 
     def test_client_from_dict_should_call_engagements_from_dict(self):
         pass
+
+    def test_client_from_dict_without_all_keys_should_fail(self):
+        with self.assertRaises(EntityTranslationError):
+            Client.from_dict({'entity': 'Client'})
+
+    def test_client_from_dict_with_wrong_entity_should_fail(self):
+        with self.assertRaises(EntityTranslationError):
+            Client.from_dict({'entity': 'Wrong'})
