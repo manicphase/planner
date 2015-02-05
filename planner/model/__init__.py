@@ -7,6 +7,39 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 
+class EntityTranslationError(Exception):
+    pass
+
+
+class Api(object):
+    __apifields__ = None
+
+    def to_dict(self):
+        d = OrderedDict()
+        d['entity'] = self.__tablename__
+        for field in self.__apifields__:
+            d[field] = self.__getattribute__(field)
+
+        return d
+
+    @staticmethod
+    def from_dict(cls, data):
+        if data['entity'] != cls.__tablename__:
+            raise EntityTranslationError
+
+        try:
+            r = cls()
+            for field in cls.__apifields__:
+                r.__setattr__(field, data[field])
+        except KeyError:
+            raise EntityTranslationError
+
+        return r
+
+    def __eq__(self, other):
+        return self.to_dict() == other.to_dict()
+
+
 Base = declarative_base()
 
 ActualEngagementIteration = Table(
@@ -31,19 +64,6 @@ TeamIterationCost = Table(
 TeamIterationCost.__tablename__ = 'TeamIterationCost'
 
 
-class Api(object):
-    def to_dict(self):
-        raise NotImplementedError
-
-    @staticmethod
-    def from_dict(data):
-        raise NotImplementedError
-
-
-class EntityTranslationError(Exception):
-    pass
-
-
 class Engagement(Api, Base):
     __tablename__ = 'Engagement'
     id = Column(Integer, autoincrement=True, primary_key=True)
@@ -63,36 +83,12 @@ class Engagement(Api, Base):
 
 
 class Client(Api, Base):
+    __apifields__ = ['name', 'engagements', 'contacts']
     __tablename__ = 'Client'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
     engagements = relationship("Engagement", backref="client")
     contacts = relationship("Contact")
-
-    def to_dict(self):
-        d = OrderedDict()
-        d['entity'] = Client.__tablename__
-        d['name'] = self.name
-        d['engagements'] = [e.to_dict() for e in self.engagements]
-        return d
-
-    @staticmethod
-    def from_dict(data):
-        if data['entity'] != Client.__tablename__:
-            raise EntityTranslationError
-
-        try:
-            client = Client(name=data['name'], engagements=data['engagements'])
-        except KeyError:
-            raise EntityTranslationError
-
-        return client
-
-    def __eq__(self, other):
-        try:
-            return self.to_dict() == other.to_dict()
-        except:
-            return False
 
 
 class EngagementStatus(Api, Base):

@@ -59,6 +59,7 @@ class TestClient(ModelTestCase):
         expected['entity'] = "Client"
         expected['name'] = "TestClient"
         expected['engagements'] = []
+        expected['contacts'] = []
         client = Client(name="TestClient")
 
         self.assertEquals(expected, client.to_dict())
@@ -69,13 +70,14 @@ class TestClient(ModelTestCase):
         data['entity'] = "Client"
         data['name'] = "TestClient"
         data['engagements'] = []
+        data['contacts'] = []
 
-        self.assertEquals(expected, Client.from_dict(data))
+        self.assertEquals(expected, Client.from_dict(Client, data))
 
     def test_client_from_dict_without_all_keys_should_fail(self):
         with self.assertRaises(EntityTranslationError):
-            Client.from_dict({'entity': 'Client'})
+            Client.from_dict(Client, {'entity': 'Client'})
 
     def test_client_from_dict_with_wrong_entity_should_fail(self):
         with self.assertRaises(EntityTranslationError):
-            Client.from_dict({'entity': 'Wrong'})
+            Client.from_dict(Client, {'entity': 'Wrong'})
