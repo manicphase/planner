@@ -5,10 +5,12 @@ from os.path import exists
 
 from planner.config import (
     TEAM_NAME, TEAM_CAPACITY, TEAM_REVENUE_CAP, TEAM_DEVMAX, TEAM_RESEARCH_MAX,
-    TEAM_COST, LIVEDBPATH, EngagementComplexity, EngagementProbability,
-    EngagementSustainability, EngagementAlignment, EngagementStatus
+    TEAM_COST, LIVEDBPATH
 )
-from planner.model import Iteration, Team
+from planner.model import (
+    Iteration, Team, EngagementComplexity, EngagementProbability,
+    EngagementSustainability, EngagementAlignment, EngagementStatus
+  )
 from planner.model.connect import new_database, LiveSession
 
 
@@ -68,10 +70,8 @@ def static_live_data():
               date(2015, 12, 7), date(2015, 12, 21)]:
         session.add(Iteration(startdate=d))
 
-    session.add(Team(name=TEAM_NAME, cost=TEAM_COST,
-                         capacity=TEAM_CAPACITY, devmax=TEAM_DEVMAX,
-                         researchmax=TEAM_RESEARCH_MAX,
-                         revenuecap=TEAM_REVENUE_CAP))
+    session.add(Team(name=TEAM_NAME, capacity=TEAM_CAPACITY, devmax=TEAM_DEVMAX,
+                     researchmax=TEAM_RESEARCH_MAX, revenuecap=TEAM_REVENUE_CAP))
     session.commit()
     session.close()
 

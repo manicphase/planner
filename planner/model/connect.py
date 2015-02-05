@@ -16,8 +16,8 @@ class DbTransactionError(Exception):
 
 
 @contextmanager
-def transaction():
-    session = LiveSession()
+def transaction(sessionmaker=LiveSession):
+    session = sessionmaker()
     try:
         yield session
         session.commit()

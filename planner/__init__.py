@@ -32,14 +32,14 @@ def add_engagement():
 def clients():
     # TODO: Swap link from to client when created, naming page 'clients.html'
     session = app.db()
-    engagements = session.query(Engagement).all()
-    return render_template("clients.html", clients=engagements)
+    clients = session.query(Client).all()
+    return render_template("clients.html", clients=clients)
 
 
 @app.route('/clients/<client_id>')
 def contact_sheet(client_id):
     session = app.db()
-    c = session.query(Contact).join(Engagement).filter_by(id=client_id)
+    c = session.query(Contact).join(Client).filter_by(id=client_id)
     return render_template("contacts.html", clients=c, client_id=client_id)
 
 

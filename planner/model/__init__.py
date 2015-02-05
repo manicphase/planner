@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, Float, Integer, Text, ForeignKey, Date, Boolean
+    Column, Float, Integer, Text, ForeignKey, Date, Boolean, Table
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,19 +7,26 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+ActualEngagementIteration = Table(
+    "ActualEngagementIteration",
+    Base.metadata,
+    Column('engagementid', Integer, ForeignKey('Engagement.id')),
+    Column('iterationid', Integer, ForeignKey('Iteration.id')))
+ActualEngagementIteration.__tablename__ = 'ActualEngagementIteration'
 
-class ActualEngagementIteration(Base):
-    __tablename__ = 'ActualEngagementIteration'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    engagementid = Column(Integer, ForeignKey('Engagement.id'))
-    iterationid = Column(Integer, ForeignKey('Iteration.id'))
+EstimatedEngagementIteration = Table(
+    "EstimatedEngagementIteration",
+    Base.metadata,
+    Column('engagementid', Integer, ForeignKey('Engagement.id')),
+    Column('iterationid', Integer, ForeignKey('Iteration.id')))
+EstimatedEngagementIteration.__tablename__ = 'EstimatedEngagementIteration'
 
-
-class EstimatedEngagementIteration(Base):
-    __tablename__ = 'EstimatedEngagementIteration'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    engagementid = Column(Integer, ForeignKey('Engagement.id'))
-    iterationid = Column(Integer, ForeignKey('Iteration.id'))
+TeamIterationCost = Table(
+    "TeamIterationCost",
+    Base.metadata,
+    Column('teamid', Integer, ForeignKey('Team.id')),
+    Column('teamcostid', Integer, ForeignKey('TeamCost.id')))
+TeamIterationCost.__tablename__ = 'TeamIterationCost'
 
 
 class Engagement(Base):
@@ -38,7 +45,6 @@ class Engagement(Base):
     sustainabilityid = Column(Integer,
                               ForeignKey('EngagementSustainability.id'))
     alignmentid = Column(Integer, ForeignKey('EngagementAlignment.id'))
-    contacts = relationship("Contact")
 
 
 class Client(Base):
@@ -46,6 +52,7 @@ class Client(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
     engagements = relationship("Engagement", backref="client")
+    contacts = relationship("Contact")
 
 
 class EngagementStatus(Base):
@@ -75,6 +82,7 @@ class EngagementProbability(Base):
     __tablename__ = 'EngagementProbability'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
+    name = Column(Text, nullable=False, unique=True)
     engagements = relationship("Engagement", backref='probability')
 
 
@@ -107,7 +115,6 @@ class Team(Base):
     devmax = Column(Float, nullable=False)
     researchmax = Column(Float, nullable=False)
     engagements = relationship('Engagement', backref='team')
-    cost = relationship('TeamCost', backref='team')
 
 
 class Contact(Base):
@@ -129,4 +136,4 @@ class TeamCost(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Integer)
     iterationid = Column(Integer, ForeignKey('Iteration.id'))
-    teamid = Column(Integer, ForeignKey('Team.id'))
+    team = relationship("Team", secondary="TeamIterationCost", backref="cost")
