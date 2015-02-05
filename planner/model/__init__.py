@@ -29,14 +29,22 @@ TeamIterationCost = Table(
 TeamIterationCost.__tablename__ = 'TeamIterationCost'
 
 
-class Engagement(Base):
+class Api(object):
+    def to_dict(self):
+        raise NotImplementedError
+
+    def from_dict(self):
+        raise NotImplementedError
+
+
+class Engagement(Api, Base):
     __tablename__ = 'Engagement'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False)
-    proposal = Column(Text, nullable=False)
-    backlog = Column(Text, nullable=False)
+    proposal = Column(Text)
+    backlog = Column(Text)
     revenue = Column(Integer, nullable=False)
-    isrnd = Column(Boolean, nullable=False)
+    isrnd = Column(Boolean, default=False)
 
     teamid = Column(Integer, ForeignKey('Team.id'), default=1)
     clientid = Column(Integer, ForeignKey('Client.id'))
@@ -48,21 +56,21 @@ class Engagement(Base):
     alignmentid = Column(Integer, ForeignKey('EngagementAlignment.id'))
 
 
-class Client(Base):
+class Client(Api, Base):
     __tablename__ = 'Client'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
     engagements = relationship("Engagement", backref="client")
 
 
-class EngagementStatus(Base):
+class EngagementStatus(Api, Base):
     __tablename__ = 'EngagementStatus'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
     engagements = relationship("Engagement", backref="status")
 
 
-class EngagementAlignment(Base):
+class EngagementAlignment(Api, Base):
     __tablename__ = 'EngagementAlignment'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
@@ -70,7 +78,7 @@ class EngagementAlignment(Base):
     engagements = relationship("Engagement", backref='alignment')
 
 
-class EngagementSustainability(Base):
+class EngagementSustainability(Api, Base):
     __tablename__ = 'EngagementSustainability'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
@@ -78,14 +86,14 @@ class EngagementSustainability(Base):
     engagements = relationship("Engagement", backref='sustainability')
 
 
-class EngagementProbability(Base):
+class EngagementProbability(Api, Base):
     __tablename__ = 'EngagementProbability'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
     engagements = relationship("Engagement", backref='probability')
 
 
-class EngagementComplexity(Base):
+class EngagementComplexity(Api, Base):
     __tablename__ = 'EngagementComplexity'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
@@ -94,7 +102,7 @@ class EngagementComplexity(Base):
     engagements = relationship("Engagement", backref='complexity')
 
 
-class Iteration(Base):
+class Iteration(Api, Base):
     __tablename__ = 'Iteration'
     id = Column(Integer, autoincrement=True, primary_key=True)
     startdate = Column(Date, nullable=False)
@@ -105,7 +113,7 @@ class Iteration(Base):
                              backref="estimated")
 
 
-class Team(Base):
+class Team(Api, Base):
     __tablename__ = 'Team'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False)
@@ -116,7 +124,7 @@ class Team(Base):
     engagements = relationship('Engagement', backref='team')
 
 
-class TeamCost(Base):
+class TeamCost(Api, Base):
     __tablename__ = 'TeamCost'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Integer)

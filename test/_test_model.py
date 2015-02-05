@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 
-from planner.model import Base, Client
+from planner.model import Base, Client, Engagement
 from planner.model.connect import transaction
 
 
@@ -12,7 +12,7 @@ class ModelTestCase(unittest.TestCase):
     def setUp(self):
         engine = create_engine('sqlite:///:memory:')
         Base.metadata.create_all(engine)
-        self.sessionmaker = sessionmaker(bind=engine)
+        self.sessionmaker = sessionmaker(expire_on_commit=False, bind=engine)
 
     def transaction(self):
         return transaction(sessionmaker=self.sessionmaker)
@@ -32,8 +32,17 @@ class TestClient(ModelTestCase):
             with self.transaction() as db:
                 db.add(Client(name="TestClient"))
 
-    def test_client_should_have_engagements(self):
-        pass
+    def test_client_should_have_correct_engagements(self):
+        expected_name = "TestEngagement"
+        with self.transaction() as db:
+            db.add(Client(name="TestClient"))
+            db.add(Engagement(name=expected_name, revenue=0, clientid=1))
+
+        with self.transaction() as db:
+            actual = db.query(Client).first().engagements
+
+        self.assertEquals(1, len(actual))
+        self.assertEquals(expected_name, actual[0].name)
 
     def test_client_engagements_can_be_empty(self):
         with self.transaction() as db:
