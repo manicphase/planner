@@ -1,3 +1,4 @@
+import unittest
 from os.path import exists
 
 from paver.easy import options, task, needs, sh, Bunch
@@ -48,7 +49,9 @@ def once():
 def unit():
     """Run unit tests
     """
-    return sh("python -m unittest discover -s test -p _test_*.py")
+    suite = unittest.TestLoader().discover('test', pattern="_test_*.py")
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    return result.errors == 0 and result.failures == 0
 
 
 @task

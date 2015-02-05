@@ -1,23 +1,7 @@
-import unittest
-from collections import OrderedDict
-
-from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import sessionmaker
 
-from planner.model import Base, Client, Engagement
-from planner.model.api import EntityTranslationError
-from planner.model.connect import transaction
-
-
-class ModelTestCase(unittest.TestCase):
-    def setUp(self):
-        engine = create_engine('sqlite:///:memory:')
-        Base.metadata.create_all(engine)
-        self.sessionmaker = sessionmaker(expire_on_commit=False, bind=engine)
-
-    def transaction(self):
-        return transaction(sessionmaker=self.sessionmaker)
+from test import ModelTestCase
+from planner.model import Client, Engagement
 
 
 class TestClient(ModelTestCase):
@@ -54,31 +38,3 @@ class TestClient(ModelTestCase):
             actual = db.query(Client).first().engagements
 
         self.assertEquals(0, len(actual))
-
-    def test_client_to_dict_should_be_accurate(self):
-        expected = OrderedDict()
-        expected['entity'] = "Client"
-        expected['name'] = "TestClient"
-        expected['engagements'] = []
-        expected['contacts'] = []
-        client = Client(name="TestClient")
-
-        self.assertEquals(expected, client.to_dict())
-
-    def test_client_from_dict_should_be_accurate(self):
-        expected = Client(name="TestClient")
-        data = OrderedDict()
-        data['entity'] = "Client"
-        data['name'] = "TestClient"
-        data['engagements'] = []
-        data['contacts'] = []
-
-        self.assertEquals(expected, Client.from_dict(Client, data))
-
-    def test_client_from_dict_without_all_keys_should_fail(self):
-        with self.assertRaises(EntityTranslationError):
-            Client.from_dict(Client, {'entity': 'Client'})
-
-    def test_client_from_dict_with_wrong_entity_should_fail(self):
-        with self.assertRaises(EntityTranslationError):
-            Client.from_dict(Client, {'entity': 'Wrong'})
