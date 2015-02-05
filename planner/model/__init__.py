@@ -47,7 +47,6 @@ class Engagement(Api, Base):
     backlog = Column(Text)
     revenue = Column(Integer, nullable=False)
     isrnd = Column(Boolean, default=False)
-
     teamid = Column(Integer, ForeignKey('Team.id'), default=1)
     clientid = Column(Integer, ForeignKey('Client.id'))
     statusid = Column(Integer, ForeignKey('EngagementStatus.id'))
@@ -63,6 +62,7 @@ class Client(Api, Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
     engagements = relationship("Engagement", backref="client")
+    contacts = relationship("Contact")
 
     def to_dict(self):
         d = OrderedDict()
@@ -99,6 +99,7 @@ class EngagementProbability(Api, Base):
     __tablename__ = 'EngagementProbability'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Float, nullable=False, unique=True)
+    name = Column(Text, nullable=False, unique=True)
     engagements = relationship("Engagement", backref='probability')
 
 
@@ -133,10 +134,22 @@ class Team(Api, Base):
     engagements = relationship('Engagement', backref='team')
 
 
+class Contact(Api, Base):
+    __tablename__ = 'Contact'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    forename = Column(Text, nullable=False)
+    surname = Column(Text, nullable=False)
+    role = Column(Text)
+    email = Column(Text)
+    landlinenumber = Column(Text)
+    mobilenumber = Column(Text)
+    address = Column(Text)
+    client = Column(Integer, ForeignKey('Client.id'))
+
+
 class TeamCost(Api, Base):
     __tablename__ = 'TeamCost'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Integer)
     iterationid = Column(Integer, ForeignKey('Iteration.id'))
-    teamid = Column(Integer, ForeignKey('Team.id'))
     team = relationship("Team", secondary="TeamIterationCost", backref="cost")
