@@ -5,7 +5,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 
-from planner.model import EntityTranslationError, Base, Client, Engagement
+from planner.model import Base, Client, Engagement
+from planner.model.api import EntityTranslationError
 from planner.model.connect import transaction
 
 
