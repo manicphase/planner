@@ -18,7 +18,7 @@
         {% if iteration in engagement.actual %}
         <td id="iter{{ iteration.id }}_eng{{ engagement.id }}" iteration="{{ iteration.id }}" engagement="{{ engagement.id }}" status="actual">{{ engagement.complexity }}</td>
         {% elif iteration in engagement.estimated %}
-        <td id="iter{{ iteration.id }}_eng{{ engagement.id }}" iteration="{{ iteration.id }}" engagement="{{ engagement.id }}" status="estimated">{{ engagement.probable_complexity() }}</td>
+        <td id="iter{{ iteration.id }}_eng{{ engagement.id }}" iteration="{{ iteration.id }}" engagement="{{ engagement.id }}" status="estimated">{{ engagement.complexity * engagement.probability }}</td>
         {% else %}
         <td id="iter{{ iteration.id }}_eng{{ engagement.id }}" iteration="{{ iteration.id }}" engagement="{{ engagement.id }}" status="removed">0</td>
         {% endif %}

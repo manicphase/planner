@@ -12,7 +12,7 @@
       {% for client in clients %}
       <tr>
         <th scope="row">{{ client.client }}</th>
-        <td id="iter{client.id}" client="{{ client.client }} ">
+        <td id="iter{client.id}" client="{{ client.name }} ">
           <a href="/clients/{{client.id}}">Contact List</a>
         </td>
       </tr>

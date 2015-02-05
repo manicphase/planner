@@ -3,43 +3,31 @@ from __future__ import division
 from planner.config import RND_TAX_CREDIT
 
 
-__all__ = ['revenue', 'finance', 'utilization']
+__all__ = ['engagement_revenue', 'iteration_revenue', 'iteration_complexity',
+           'finance', 'utilization']
 
 
-def certain_rnd_revenue(e):
-    return e.team.cost * RND_TAX_CREDIT if e.isrnd else 0.0
+def _eirev(e):
+    return e.revenue + (e.team.cost * RND_TAX_CREDIT if e.isrnd else 0.0)
 
 
-def certain_iteration_revenue(e):
-    return e.revenue + certain_rnd_revenue(e)
+def engagement_revenue(e):
+    return (_eirev(e) * len(e.actual) +
+            _eirev(e) * e.probability * len(e.estimated))
 
 
-def probable_iteration_revenue(e):
-    return certain_iteration_revenue(e) * e.probability
+def iteration_revenue(i):
+    return (sum(map(i.actual, _eirev)) +
+            sum(map(i.estimated, lambda e: _eirev(e) * e.probability)))
 
 
-def certain_iterations(e):
-    return len(e.actual)
+def iteration_complexity(i):
+    return (sum(map(i.actual, lambda e: e.complexity)) +
+            sum(map(i.estimated, lambda e: e.complexity * e.probability)))
 
 
-def probable_iterations(e):
-    return len(e.estimated)
-
-
-def certain_engagement_revenue(e):
-    return certain_iteration_revenue(e) * certain_iterations(e)
-
-
-def probable_engagement_revenue(e):
-    return probable_iteration_revenue(e) * probable_iterations(e)
-
-
-def revenue(e):
-    return certain_engagement_revenue(e) + probable_iteration_revenue(e)
-
-
-def finance(team, iterations, engagements):
-    return {'labels': [str(iteration.startdate) for iteration in iterations],
+def finance(team, iterations):
+    return {'labels': [str(i.startdate) for i in iterations],
             'datasets': [
                 {'label': "Cost in GBP",
                  'fillColor': "rgba(255, 0, 0, 0.2)",
@@ -48,7 +36,7 @@ def finance(team, iterations, engagements):
                  'pointStrokeColor': "#fff",
                  'pointHighlightFill': "#fff",
                  'pointHighlightStroke': "rgba(255, 0, 0, 1)",
-                 'data': [team.cost for iteration in iterations]},
+                 'data': [team.cost for i in iterations]},
                 {'label': "Revenue in GBP",
                  'fillColor': "rgba(0, 255, 0, 0.2)",
                  'strokeColor': "rgba(0, 255, 0, 1)",
@@ -56,16 +44,11 @@ def finance(team, iterations, engagements):
                  'pointStrokeColor': "#fff",
                  'pointHighlightFill': "#fff",
                  'pointHighlightStroke': "rgba(0, 255, 0, 1)",
-                 'data': [sum([engagement.revenue *
-                               float(engagement.probability)
-                               for engagement in engagements
-                               if iteration in engagement.actual
-                               or iteration in engagement.estimated])
-                          for iteration in iterations]}]}
+                 'data': [iteration_revenue(i) for i in iterations]}]}
 
 
 def utilization(team, iterations, engagements):
-    return {'labels': [str(iteration.startdate) for iteration in iterations],
+    return {'labels': [str(i.startdate) for i in iterations],
             'datasets': [
                 {'label': u"Utilization in Percentage of Capacity",
                  'fillColor': "rgba(220, 220, 220, 0.2)",
@@ -74,8 +57,4 @@ def utilization(team, iterations, engagements):
                  'pointStrokeColor': "#fff",
                  'pointHighlightFill': "#fff",
                  'pointHighlightStroke': "rgba(220, 220, 220, 1)",
-                 'data': [sum([engagement.probable_complexity()
-                               for engagement in engagements
-                               if iteration in engagement.actual
-                               or iteration in engagement.estimated])
-                          / team.capacity for iteration in iterations]}]}
+                 'data': [iteration_complexity(i) for i in iterations]}]}

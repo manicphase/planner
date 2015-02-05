@@ -1,6 +1,6 @@
 import unittest
 
-from planner.logic import revenue
+from planner.logic import engagement_revenue
 from test.stubs import StubIteration, StubEngagement, StubTeam
 
 
@@ -9,7 +9,7 @@ class TestLogic(unittest.TestCase):
         engagement = StubEngagement(revenue=100, actual=[StubIteration()])
         expected = engagement.revenue
 
-        actual = revenue(engagement)
+        actual = engagement_revenue(engagement)
 
         self.assertEquals(expected, actual)
 
@@ -18,7 +18,7 @@ class TestLogic(unittest.TestCase):
                                     estimated=[StubIteration()])
         expected = engagement.revenue * engagement.probability
 
-        actual = revenue(engagement)
+        actual = engagement_revenue(engagement)
 
         self.assertEquals(expected, actual)
 
@@ -28,6 +28,18 @@ class TestLogic(unittest.TestCase):
                                     team=team)
         expected = team.cost * 0.25
 
-        actual = revenue(engagement)
+        actual = engagement_revenue(engagement)
+
+        self.assertEquals(expected, actual)
+
+    def test_complex_engagement_should_have_accurate_revenue(self):
+        engagement = StubEngagement(revenue=100, actual=[StubIteration()],
+                                    estimated=[StubIteration()], isrnd=True)
+        estimated = engagement.revenue * engagement.probability
+        actual = engagement.revenue
+        rnd = engagement.team.cost * 0.25
+        expected = estimated + actual + rnd
+
+        actual = engagement_revenue(engagement)
 
         self.assertEquals(expected, actual)
