@@ -63,9 +63,6 @@ class TestClient(ModelTestCase):
 
         self.assertEquals(expected, client.to_dict())
 
-    def test_client_to_dict_should_call_engagements_to_dict(self):
-        pass
-
     def test_client_from_dict_should_be_accurate(self):
         expected = Client(name="TestClient")
         data = OrderedDict()
@@ -74,9 +71,6 @@ class TestClient(ModelTestCase):
         data['engagements'] = []
 
         self.assertEquals(expected, Client.from_dict(data))
-
-    def test_client_from_dict_should_call_engagements_from_dict(self):
-        pass
 
     def test_client_from_dict_without_all_keys_should_fail(self):
         with self.assertRaises(EntityTranslationError):
