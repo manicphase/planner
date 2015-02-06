@@ -188,7 +188,7 @@ class Team(Api, Base):
 class Contact(Api, Base):
     __apientityname__ = "Contact"
     __apifields__ = ['forename', 'surname', 'role', 'email', 'landlinenumber',
-                     'mobilenumber', 'address']
+                     'mobilenumber', 'postcode', 'streetname', 'streetnumber']
     __tablename__ = 'Contact'
     id = Column(Integer, autoincrement=True, primary_key=True)
     forename = Column(Text, nullable=False)
@@ -197,7 +197,9 @@ class Contact(Api, Base):
     email = Column(Text)
     landlinenumber = Column(Text)
     mobilenumber = Column(Text)
-    address = Column(Text)
+    postcode = Column(Text)
+    streetname = Column(Text)
+    streetnumber = Column(Text)
 
     @validates('email')
     def validate_email(self, key, address):
