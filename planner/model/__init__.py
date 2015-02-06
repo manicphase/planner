@@ -205,6 +205,16 @@ class Contact(Api, Base):
             raise ValidationError
         return address
 
+    @validates('mobilenumber')
+    def validate_mobilenumber(self, key, address):
+        if not address.startswith('07') or not len(address) == 10:
+            raise ValidationError
+        try:
+            int(address)
+        except TypeError:
+            raise ValidationError
+        return address
+
 
 class TeamCost(Api, Base):
     __apientityname__ = 'TeamCost'

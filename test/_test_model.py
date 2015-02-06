@@ -113,3 +113,23 @@ class TestContact(ModelTestCase):
         with self.assertRaises(ValidationError):
             with self.transaction() as db:
                 db.add(Contact(forename="Mc", surname="Test", email="no.com"))
+
+    def test_contact_mobilenumber_should_be_valid_uk_mobile(self):
+        with self.transaction() as db:
+            db.add(Contact(forename="Mc", surname="Test",
+                           mobilenumber="0712345678"))
+
+        with self.assertRaises(ValidationError):
+            with self.transaction() as db:
+                db.add(Contact(forename="Mc", surname="Test",
+                               mobilenumber="ten"))
+
+        with self.assertRaises(ValidationError):
+            with self.transaction() as db:
+                db.add(Contact(forename="Mc", surname="Test",
+                               mobilenumber="07345678910"))
+
+        with self.assertRaises(ValidationError):
+            with self.transaction() as db:
+                db.add(Contact(forename="Mc", surname="Test",
+                               mobilenumber="1234567890"))
