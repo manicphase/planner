@@ -2,6 +2,7 @@ import unittest
 from os.path import exists
 
 from paver.easy import options, task, needs, sh, Bunch
+from paver.runtime import BuildFailure
 from paver.setuputils import install_distutils_tasks
 from paver.virtual import virtualenv
 
@@ -19,7 +20,7 @@ options(
     ),
     virtualenv=Bunch(
         packages_to_install=['SQLAlchemy', 'Flask', 'wtforms', 'virtualenv',
-                             'flake8', 'ipython'],
+                             'flake8', 'ipython', 'coverage'],
         script_name='bootstrap.py',
         dest_dir='venv'
     )
@@ -51,7 +52,19 @@ def unit():
     """
     suite = unittest.TestLoader().discover('test', pattern="_test_*.py")
     result = unittest.TextTestRunner(verbosity=2).run(suite)
-    return result.errors == 0 and result.failures == 0
+    if not result.errors == 0 and result.failures == 0:
+        raise BuildFailure()
+
+
+@task
+@virtualenv(dir="venv")
+def coverage():
+    """Run coverage
+    """
+    sh("coverage erase")
+    sh("coverage run --source planner\
+       -m unittest discover -s test -p _test_*.py")
+    sh("coverage report")
 
 
 @task

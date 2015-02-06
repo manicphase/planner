@@ -8,3 +8,4 @@ build
 bootstrap.py
 setup.py
 paver-minilib.zip
+.coverage
