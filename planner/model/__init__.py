@@ -178,6 +178,12 @@ class Team(Api, Base):
     devmax = Column(Float, nullable=False)
     researchmax = Column(Float, nullable=False)
 
+    @validates('capacity')
+    def validate_capacity(self, key, address):
+        if address < self.devmax + self.researchmax:
+            raise ValidationError
+        return address
+
 
 class Contact(Api, Base):
     __apientityname__ = "Contact"

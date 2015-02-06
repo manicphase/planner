@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from test import ModelTestCase
 from planner.model import (
     Client, EngagementStatus, EngagementAlignment, Contact, Iteration,
-    Engagement, ActualEngagementIteration, Team,
+    Engagement, ActualEngagementIteration, Team, ValidationError,
     EngagementComplexity, EngagementProbability, EngagementSustainability
 )
 
@@ -100,3 +100,9 @@ class TestTeam(ModelTestCase):
     def test_team_should_have_a_unique_name(self):
         self.assertHasUniqueName(Team, capacity=1.0, revenuecap=1, devmax=0.4,
                                  researchmax=0.6)
+
+    def test_team_capacity_should_exceed_sum_of_researchmax_and_devmax(self):
+        with self.assertRaises(ValidationError):
+            with self.transaction() as db:
+                db.add(Team(name="Name", capacity=0, revenuecap=1, devmax=0.1,
+                            researchmax=0.1))
