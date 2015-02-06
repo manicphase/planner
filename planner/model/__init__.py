@@ -139,7 +139,7 @@ class EngagementProbability(Api, Base):
     def validate_value(self, key, address):
         if address not in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
                            1.0]:
-            raise ValidationError()
+            raise ValidationError
         return address
 
 
@@ -155,7 +155,7 @@ class EngagementComplexity(Api, Base):
     @validates('value')
     def validate_value(self, key, address):
         if address not in [0.1, 0.5, 1.0, 2.0]:
-            raise ValidationError()
+            raise ValidationError
         return address
 
 
