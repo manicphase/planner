@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from test import ModelTestCase
 from planner.model import (
     Client, EngagementStatus, EngagementAlignment, Contact, Iteration,
-    Engagement, ActualEngagementIteration, Team, ValidationError,
+    Engagement, ActualEngagementIteration, Team, ValidationError, TeamCost,
     EngagementComplexity, EngagementProbability, EngagementSustainability
 )
 
@@ -133,3 +133,10 @@ class TestContact(ModelTestCase):
             with self.transaction() as db:
                 db.add(Contact(forename="Mc", surname="Test",
                                mobilenumber="1234567890"))
+
+
+class TestTeamCost(ModelTestCase):
+    def test_team_cost_should_be_greater_than_zero(self):
+        with self.assertRaises(ValidationError):
+            with self.transaction() as db:
+                db.add(TeamCost(value=-1))

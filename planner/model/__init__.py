@@ -230,3 +230,9 @@ class TeamCost(Api, Base):
 
     iteration = relationship("Iteration")
     team = relationship("Team", secondary="TeamIterationCost", backref="cost")
+
+    @validates('value')
+    def validate_value(self, key, address):
+        if address < 0:
+            raise ValidationError
+        return address
