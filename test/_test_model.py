@@ -106,3 +106,10 @@ class TestTeam(ModelTestCase):
             with self.transaction() as db:
                 db.add(Team(name="Name", capacity=0, revenuecap=1, devmax=0.1,
                             researchmax=0.1))
+
+
+class TestContact(ModelTestCase):
+    def test_contact_email_should_contain_at_symbol(self):
+        with self.assertRaises(ValidationError):
+            with self.transaction() as db:
+                db.add(Contact(forename="Mc", surname="Test", email="no.com"))

@@ -199,6 +199,12 @@ class Contact(Api, Base):
     mobilenumber = Column(Text)
     address = Column(Text)
 
+    @validates('email')
+    def validate_email(self, key, address):
+        if '@' not in address:
+            raise ValidationError
+        return address
+
 
 class TeamCost(Api, Base):
     __apientityname__ = 'TeamCost'
