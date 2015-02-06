@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from test import ModelTestCase
 from planner.model import (
     Client, EngagementStatus, EngagementAlignment, Contact, Iteration,
-    Engagement, ActualEngagementIteration,
+    Engagement, ActualEngagementIteration, Team,
     EngagementComplexity, EngagementProbability, EngagementSustainability
 )
 
@@ -94,3 +94,9 @@ class TestIteration(ModelTestCase):
 
         self.assertEquals(expected, actual[0])
         self.assertTrue(len(actual) == 1)
+
+
+class TestTeam(ModelTestCase):
+    def test_team_should_have_a_unique_name(self):
+        self.assertHasUniqueName(Team, capacity=1.0, revenuecap=1, devmax=0.4,
+                                 researchmax=0.6)

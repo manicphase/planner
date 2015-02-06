@@ -172,7 +172,7 @@ class Team(Api, Base):
     __apifields__ = ['name', 'capacity', 'revenuecap', 'devmax', 'researchmax']
     __tablename__ = 'Team'
     id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(Text, nullable=False)
+    name = Column(Text, unique=True, nullable=False)
     capacity = Column(Float, nullable=False)
     revenuecap = Column(Integer, nullable=False)
     devmax = Column(Float, nullable=False)
