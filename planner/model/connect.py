@@ -16,10 +16,12 @@ class DbTransactionError(Exception):
 
 
 @contextmanager
-def transaction(sessionmaker=LiveSession):
+def transaction(rollback=False, sessionmaker=LiveSession):
     session = sessionmaker()
     try:
         yield session
+        if rollback:
+            session.rollback()
         session.commit()
     finally:
         session.close()

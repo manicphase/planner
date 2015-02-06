@@ -10,15 +10,20 @@ class Api(object):
 
     def to_dict(self):
         d = OrderedDict()
-        d['entity'] = self.__tablename__
+        d['entity'] = self.__apientityname__
         for field in self.__apifields__:
-            d[field] = self.__getattribute__(field)
+            try:
+                d[field] = self.__getattribute__(field)
+                if not isinstance(d[field], OrderedDict):
+                    d[field] = d[field].to_dict()
+            except Exception:
+                d[field] = None
 
         return d
 
     @staticmethod
     def from_dict(cls, data):
-        if data['entity'] != cls.__tablename__:
+        if data['entity'] != cls.__apientityname__:
             raise EntityTranslationError
 
         try:
