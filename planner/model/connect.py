@@ -4,10 +4,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from planner.model import Base
-from planner.config import LiveConfig
+from planner.config import CurrentConfig
 
 
-LiveSession = sessionmaker(bind=create_engine(LiveConfig.LIVEDBPATH))
+LiveSession = sessionmaker(bind=create_engine(CurrentConfig.DBPATH))
 
 
 class DbTransactionError(Exception):
@@ -27,5 +27,5 @@ def transaction(rollback=False, sessionmaker=LiveSession):
 
 
 def new_database():
-    engine = create_engine(LiveConfig.LIVEDBPATH)
+    engine = create_engine(CurrentConfig.DBPATH)
     Base.metadata.create_all(engine)

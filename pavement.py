@@ -108,3 +108,16 @@ def up():
     """Start the server up
     """
     return sh("python planner")
+
+
+@task
+@needs(['paver.setuputils.develop', 'ci', 'db'])
+@virtualenv(dir="venv")
+def live_up():
+    """Start the server up using StableConfig
+    """
+    # Monkeypatch config
+    from planner import config
+    config.CurrentConfig = config.StableConfig
+    from planner import app
+    app.run()

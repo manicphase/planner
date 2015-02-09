@@ -1,12 +1,14 @@
-__all__ = ['LiveConfig']
+from os import environ
 
 
-class Config(object):
+class StableConfig:
+    DBPATH = environ.get("PLANNER_DB", "sqlite:///live.db")
+    DISABLED_FEATURES = ['index']
+
+
+class HeadConfig:
+    DBPATH = 'sqlite:///live.db'
     DISABLED_FEATURES = []
 
-    def __init__(self, live_db_path=None):
-        self.LIVEDBPATH = live_db_path
 
-
-# TODO: Decide how to specify which config / env we are in
-LiveConfig = Config(live_db_path='sqlite:///live.db')
+CurrentConfig = HeadConfig
