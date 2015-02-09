@@ -116,8 +116,5 @@ def up():
 def live_up():
     """Start the server up using StableConfig
     """
-    # Monkeypatch config
-    from planner import config
-    config.CurrentConfig = config.StableConfig
-    from planner import app
-    app.run()
+    from planner import config, create_app
+    create_app(config.StableConfig).run()

@@ -3,7 +3,7 @@
 from datetime import date
 from os.path import exists
 
-from planner.config import LiveConfig
+from planner.config import CurrentConfig
 from planner.model import (
     Iteration, Team, EngagementComplexity, EngagementProbability,
     EngagementSustainability, EngagementAlignment, EngagementStatus
@@ -69,7 +69,7 @@ def static_live_data():
 
 
 if __name__ == '__main__':
-    engine = create_engine(LiveConfig.LIVEDBPATH)
+    engine = create_engine(CurentConfig.LIVEDBPATH)
     Base.metadata.create_all()
     static_live_data()
     print "DB created"
