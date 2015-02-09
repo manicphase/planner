@@ -1,10 +1,9 @@
-# TODO Use env specific config objects
-LIVEDBPATH = 'live.db'
-SECRET_KEY = 'changeme'
-TEAM_NAME = 'CHANGEME'
-TEAM_CAPACITY = 1.0
-TEAM_REVENUE_CAP = 1
-TEAM_DEVMAX = 1.0
-TEAM_RESEARCH_MAX = 1.0
-TEAM_COST = 1
-RND_TAX_CREDIT = 0.25
+__all__ = ['LiveConfig']
+
+
+class Config(object):
+    def __init__(self, live_db_path=None):
+        self.LIVEDBPATH = live_db_path
+
+
+LiveConfig = Config(live_db_path='sqlite:///live.db')

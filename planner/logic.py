@@ -1,14 +1,13 @@
 from __future__ import division
 
-from planner.config import RND_TAX_CREDIT
-
 
 __all__ = ['engagement_revenue', 'iteration_revenue', 'iteration_complexity',
            'finance', 'utilization']
 
 
 def _eirev(e):
-    return e.revenue + (e.team.cost * RND_TAX_CREDIT if e.isrnd else 0.0)
+    # TODO: fix 0.25 being magical for RND Tax Credit
+    return e.revenue + (e.team.cost * 0.25 if e.isrnd else 0.0)
 
 
 def engagement_revenue(e):
