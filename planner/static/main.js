@@ -12,7 +12,7 @@ var app = (function(jquery, Chartjs) {
       type: "POST",
       contentType: "application/json; charset=utf-8",
       url: "api/schedule/iteration-for-engagement",
-      data: JSON.stringify({status: status, iteration: source.attr('iteration'), engagement: source.attr('engagement')}),
+      data: JSON.stringify({entity: null, iteration: source.attr('iteration'), engagement: source.attr('engagement')}),
       success: function(data) {
         jquery('#'+data.id).text(data.value);
         jquery('#'+data.id).attr('status', data.status);

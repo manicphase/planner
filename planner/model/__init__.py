@@ -18,26 +18,23 @@ ActualEngagementIteration = Table(
     Base.metadata,
     Column('engagementid', Integer, ForeignKey('Engagement.id')),
     Column('iterationid', Integer, ForeignKey('Iteration.id')))
-ActualEngagementIteration.__tablename__ = 'ActualEngagementIteration'
 
 EstimatedEngagementIteration = Table(
     "EstimatedEngagementIteration",
     Base.metadata,
     Column('engagementid', Integer, ForeignKey('Engagement.id')),
     Column('iterationid', Integer, ForeignKey('Iteration.id')))
-EstimatedEngagementIteration.__tablename__ = 'EstimatedEngagementIteration'
 
 TeamIterationCost = Table(
     "TeamIterationCost",
     Base.metadata,
     Column('teamid', Integer, ForeignKey('Team.id')),
     Column('teamcostid', Integer, ForeignKey('TeamCost.id')))
-TeamIterationCost.__tablename__ = 'TeamIterationCost'
 
 
 class Engagement(Api, Base):
     __apientityname__ = 'Engagement'
-    __apifields__ = ['name', 'proposal', 'backlog', 'revenue', 'isrnd',
+    __apifields__ = ['id', 'name', 'proposal', 'backlog', 'revenue', 'isrnd',
                      'client', 'status', 'alignment', 'sustainability',
                      'probability', 'complexity', 'actual', 'estimated',
                      'team']
@@ -161,7 +158,7 @@ class EngagementComplexity(Api, Base):
 
 class Iteration(Api, Base):
     __apientityname__ = 'Iteration'
-    __apifields__ = ['startdate', 'actual', 'estimated']
+    __apifields__ = ['id', 'startdate', 'actual', 'estimated']
     __tablename__ = 'Iteration'
     id = Column(Integer, autoincrement=True, primary_key=True)
     startdate = Column(Date, nullable=False)
@@ -223,9 +220,9 @@ class TeamCost(Api, Base):
     __apifields__ = ['value', 'team', 'iteration']
     __tablename__ = 'TeamCost'
     id = Column(Integer, autoincrement=True, primary_key=True)
-    value = Column(Integer)
+    value = Column(Integer, nullable=False)
 
-    iterationid = Column(Integer, ForeignKey('Iteration.id'))
+    iterationid = Column(Integer, ForeignKey('Iteration.id'), nullable=False)
     teamid = Column(Integer, ForeignKey('Team.id'))
 
     iteration = relationship("Iteration")
