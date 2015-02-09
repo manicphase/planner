@@ -1,6 +1,7 @@
 from flask import Flask, abort, current_app, render_template, Blueprint
 
-from planner.model import Iteration, Engagement, Contact, Client
+from planner.model import Engagement
+from planner.model.connect import TransactionFactory
 from planner.api import Routes, crudify
 from planner.flags import Flag
 from planner.config import HeadConfig
@@ -16,6 +17,14 @@ def create_app(config=HeadConfig):
     app.config.from_object(config)
     app.register_blueprint(ui)
     app.register_blueprint(api)
+    app.transaction = TransactionFactory(
+        app.config['DBPATH'], create_all=app.config.get("DBCREATE"))
+    crudify(app,
+            read=Routes('/api/read/', Engagement),
+            update=Routes('/api/update/'),
+            create=Routes('/api/create/', Engagement),
+            delete=Routes('/api/delete/'))
+
     return app
 
 
@@ -59,9 +68,3 @@ def add_contact():
 @feature
 def schedule_iteration_for_engagement(self):
     pass
-
-
-# TODO: view flag needs to work with this
-crudify(api,
-        read=Routes('/api/read/', Iteration),
-        create=Routes('/api/create/', Engagement, Client, Contact))

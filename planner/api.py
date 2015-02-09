@@ -1,8 +1,7 @@
 from collections import OrderedDict
+import pdb
 
 from flask import request, jsonify
-
-from planner.model.connect import transaction
 
 
 class EntityTranslationError(Exception):
@@ -11,7 +10,7 @@ class EntityTranslationError(Exception):
 
 def crudify(app, read=None, delete=None, update=None, create=None):
     if read:
-        read.register(Read, app)
+        read.register(Read, app, methods=['GET'])
     if delete:
         delete.register(Delete, app)
     if create:
@@ -27,7 +26,7 @@ class Api(object):
         d['entity'] = self.__apientityname__
         for field in self.__apifields__:
             try:
-                d[field] = self.__getattribute__(field)
+                d[field] = getattr(self, field)
                 if not isinstance(d[field], OrderedDict):
                     d[field] = d[field].to_dict()
             except Exception:
@@ -35,12 +34,12 @@ class Api(object):
 
         return d
 
-    @staticmethod
+    @classmethod
     def from_dict(cls, data):
-        if data['entity'] != cls.__apientityname__:
-            raise EntityTranslationError
-
         try:
+            if data.get('entity') != cls.__apientityname__:
+                raise EntityTranslationError
+
             r = cls()
             for field in cls.__apifields__:
                 r.__setattr__(field, data[field])
@@ -58,10 +57,11 @@ class Routes(object):
         self.prefix = prefix
         self.models = models
 
-    def register(self, method, app):
+    def register(self, method, app, methods=['POST']):
         for model in self.models:
-            app.add_url_rule(self.url(model), self.name(model), method(model),
-                             methods=['POST'])
+            app.add_url_rule(self.url(model), self.name(model),
+                             method(app.transaction, model),
+                             methods=methods)
 
     def url(self, model):
         return self.prefix + model.__apientityname__
@@ -71,32 +71,37 @@ class Routes(object):
 
 
 class Read(object):
-    def __init__(self, model):
+    def __init__(self, transaction, model):
         self.model = model
+        self.transaction = transaction
 
     def __call__(self):
-        with transaction() as db:
-            return jsonify(data=map(db.query(self.model).all(),
-                           lambda r: r.to_dict()))
+        with self.transaction() as db:
+            return jsonify(data=map(lambda r: r.to_dict(),
+                                    db.query(self.model).all()))
 
 
 class Create(object):
-    def __init__(self, model):
+    def __init__(self, transaction, model):
         self.model = model
+        self.transaction = transaction
 
     def __call__(self):
-        with transaction() as db:
-            db.add(self.model.from_dict(request.get_json()))
+        with self.transaction() as db:
+            pdb.set_trace()
+            data = request.get_json()
+            db.add(self.model.from_dict(data))
 
         return "OK"
 
 
 class Delete(object):
-    def __init__(self, model):
+    def __init__(self, transaction, model):
         self.model = model
+        self.transaction = transaction
 
     def __call__(self):
-        with transaction() as db:
+        with self.transaction() as db:
             db.delete(db.query(self.model).filter_by(
                 id=request.get_json()['id']).first()
             )

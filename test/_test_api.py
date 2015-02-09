@@ -1,6 +1,6 @@
 import unittest
 
-from planner.model.api import Api, EntityTranslationError
+from planner.api import Api, EntityTranslationError
 
 
 class Dummy(Api):
@@ -15,11 +15,11 @@ class Dummy(Api):
 class TestApi(unittest.TestCase):
     def test_to_dict_without_all_keys_should_fail(self):
         with self.assertRaises(EntityTranslationError):
-            Dummy.from_dict(Dummy, {'entity': 'Dummy'})
+            Dummy.from_dict({'entity': 'Dummy'})
 
     def test_to_dict_with_wrong_entity_should_fail(self):
         with self.assertRaises(EntityTranslationError):
-            Dummy.from_dict(Dummy, {'entity': 'Wrong'})
+            Dummy.from_dict({'entity': 'Wrong'})
 
     def test_api_should_be_equal_when_fields_and_entity_match(self):
         left = Dummy()

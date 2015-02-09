@@ -2,30 +2,28 @@ from contextlib import contextmanager
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from planner.model import Base
-from planner.config import CurrentConfig
 
 
-LiveSession = sessionmaker(bind=create_engine(CurrentConfig.DBPATH))
+class TransactionFactory(object):
+    def __init__(self, path=None, bind=None, expire_on_commit=False,
+                 create_all=False):
+        if (not bind and not path) or (bind and path):
+            raise ValueError
+        if not bind:
+            bind = create_engine(path)
+        if create_all:
+            Base.metadata.create_all(bind)
+        self.sessionmaker = sessionmaker(expire_on_commit=expire_on_commit,
+                                         bind=bind)
 
-
-class DbTransactionError(Exception):
-    pass
-
-
-@contextmanager
-def transaction(rollback=False, sessionmaker=LiveSession):
-    session = sessionmaker()
-    try:
-        yield session
-        if rollback:
-            session.rollback()
-        session.commit()
-    finally:
-        session.close()
-
-
-def new_database():
-    engine = create_engine(CurrentConfig.DBPATH)
-    Base.metadata.create_all(engine)
+    @contextmanager
+    def __call__(self, rollback=False):
+        try:
+            session = self.sessionmaker()
+            yield session
+            if rollback:
+                session.rollback()
+            session.commit()
+        finally:
+            session.close()

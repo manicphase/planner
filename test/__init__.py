@@ -1,22 +1,33 @@
 import unittest
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 
-from planner.model import Base, ValidationError
-from planner.model.connect import transaction
+from planner import create_app
+from planner.model import ValidationError
+from planner.model.connect import TransactionFactory
 
 
-class ModelTestCase(unittest.TestCase):
+class TestConfig:
+    DBPATH = "sqlite:///:memory:"
+    DBCREATE = True
+    DISABLED_FEATURES = []
+    TESTING = True
+
+
+class BaseTestCase(unittest.TestCase):
     def setUp(self):
         engine = create_engine('sqlite:///:memory:')
-        Base.metadata.create_all(engine)
-        self.sessionmaker = sessionmaker(expire_on_commit=False, bind=engine)
+        self.transaction = TransactionFactory(bind=engine, create_all=True)
 
-    def transaction(self, rollback=False):
-        return transaction(rollback=rollback, sessionmaker=self.sessionmaker)
 
+class AcceptanceTestCase(BaseTestCase):
+    def setUp(self):
+        self.app = create_app(TestConfig)
+        self.client = self.app.test_client()
+
+
+class ModelTestCase(BaseTestCase):
     def assertHasUniqueName(self, model, **others):
         with self.assertRaises(IntegrityError):
             with self.transaction() as db:

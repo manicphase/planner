@@ -1,5 +1,4 @@
 import unittest
-from os.path import exists
 
 from paver.easy import options, task, needs, sh, Bunch
 from paver.runtime import BuildFailure
@@ -53,7 +52,7 @@ def unit():
     suite = unittest.TestLoader().discover('test', pattern="_test_*.py")
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.errors == 0 and result.failures == 0:
-        raise BuildFailure()
+        raise BuildFailure
 
 
 @task
@@ -76,7 +75,19 @@ def lint():
 
 
 @task
-@needs(['lint', 'unit'])
+@needs(['paver.setuputils.develop'])
+@virtualenv(dir='venv')
+def acceptance():
+    """Run acceptance tests
+    """
+    suite = unittest.TestLoader().discover('test', pattern='_acceptance_*.py')
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    if not result.errors == 0 and result.failures == 0:
+        raise BuildFailure
+
+
+@task
+@needs(['clean', 'lint', 'unit', 'acceptance'])
 @virtualenv(dir="venv")
 def ci():
     """Run the continuous integration pipeline
@@ -88,7 +99,7 @@ def ci():
 def clean():
     """Clean up the build artifacts etc
     """
-    return max([sh('rm -rf ./*.zip venv bootstrap.py ./*.egg* build'),
+    return max([sh('rm -rf ./*.zip bootstrap.py ./*.egg* build'),
                 sh('find . -name "*.pyc" -delete')])
 
 
@@ -96,9 +107,9 @@ def clean():
 @needs(['paver.setuputils.develop'])
 @virtualenv(dir="venv")
 def db():
-    from planner.config import CurrentConfig
-    if not exists(CurrentConfig.DBPATH):
-        sh("python scripts/mkdb.py")
+    """Make the db
+    """
+    pass
 
 
 @task

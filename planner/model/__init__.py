@@ -4,7 +4,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.ext.declarative import declarative_base
 
-from planner.model.api import Api
+from planner.api import Api
 
 
 class ValidationError(Exception):
