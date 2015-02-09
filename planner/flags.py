@@ -1,5 +1,8 @@
+from config import LiveConfig
+
+
 def feature_enabled(feature_name):
-    return True
+    return feature_name not in LiveConfig.DISABLED_FEATURES
 
 
 class Flag(object):
