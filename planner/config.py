@@ -1,3 +1,4 @@
+# TODO Use env specific config objects
 LIVEDBPATH = 'live.db'
 SECRET_KEY = 'changeme'
 TEAM_NAME = 'CHANGEME'
