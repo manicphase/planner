@@ -1,6 +1,7 @@
 import unittest
 
 from planner.flags import Flag
+from planner.config import CurrentConfig
 
 
 class TestFlags(unittest.TestCase):
@@ -14,10 +15,10 @@ class TestFlags(unittest.TestCase):
 
         self.assertTrue(wrapped())
 
-    @unittest.skip("Not yet implemented flag configs")
     def test_feature_disabled_should_call_default_func(self):
         func = lambda: True
         func.__name__ = "DisabledFunctionA"
+        CurrentConfig.DISABLED_FEATURES.append(func.__name__)
         default_func = lambda: False
         flag_wrapper = Flag(default_func)
 

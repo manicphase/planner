@@ -52,6 +52,7 @@ def schedule_iteration_for_engagement(self):
     pass
 
 
+# TODO: view flag needs to work with this
 crudify(app,
         read=Routes('/api/read/', Iteration),
         create=Routes('/api/create/', Engagement, Client, Contact))

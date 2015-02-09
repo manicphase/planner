@@ -96,8 +96,8 @@ def clean():
 @needs(['paver.setuputils.develop'])
 @virtualenv(dir="venv")
 def db():
-    from planner.config import LIVEDBPATH
-    if not exists(LIVEDBPATH):
+    from planner.config import CurrentConfig
+    if not exists(CurrentConfig.DBPATH):
         sh("python scripts/mkdb.py")
 
 
@@ -111,7 +111,7 @@ def up():
 
 
 @task
-@needs(['paver.setuputils.develop', 'ci', 'db'])
+@needs(['paver.setuputils.develop'])
 @virtualenv(dir="venv")
 def live_up():
     """Start the server up using StableConfig
