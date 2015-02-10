@@ -27,15 +27,6 @@ options(
 
 
 @task
-@needs(['paver.setuputils.develop', 'db'])
-@virtualenv(dir='venv')
-def dbrepl():
-    """Open ipython with session to live db
-    """
-    sh('ipython -i scripts/dbrepl.py')
-
-
-@task
 @needs(['minilib', 'generate_setup', 'paver.virtual.bootstrap'])
 def once():
     """Run once when you first start using this codebase
@@ -44,7 +35,14 @@ def once():
 
 
 @task
-@needs(['paver.setuputils.develop'])
+@needs(['clean', 'paver.setuputils.develop'])
+@virtualenv(dir="venv")
+def build():
+    """Build
+    """
+
+
+@task
 @virtualenv(dir="venv")
 def unit():
     """Run unit tests
@@ -76,7 +74,6 @@ def lint():
 
 
 @task
-@needs(['paver.setuputils.develop'])
 @virtualenv(dir='venv')
 def acceptance():
     """Run acceptance tests
@@ -89,7 +86,7 @@ def acceptance():
 
 
 @task
-@needs(['clean', 'lint', 'unit', 'acceptance'])
+@needs(['clean', 'build', 'lint', 'unit', 'acceptance'])
 @virtualenv(dir="venv")
 def ci():
     """Run the continuous integration pipeline
@@ -106,27 +103,19 @@ def clean():
 
 
 @task
-@needs(['paver.setuputils.develop'])
+@needs(['build'])
 @virtualenv(dir="venv")
-def db():
-    """Make the db
+def devup():
+    """Start the server using HeadConfig
     """
-    pass
-
-
-@task
-@needs(['paver.setuputils.develop', 'ci', 'db'])
-@virtualenv(dir="venv")
-def up():
-    """Start the server up
-    """
-    return sh("python planner")
+    from planner import config, create_app
+    create_app(config.HeadConfig).run(debug=True)
 
 
 @task
 @needs(['paver.setuputils.develop'])
 @virtualenv(dir="venv")
-def live_up():
+def liveup():
     """Start the server up using StableConfig
     """
     from planner import config, create_app
