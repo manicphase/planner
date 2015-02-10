@@ -2,42 +2,71 @@
 
 var app = (function(jquery, Chartjs) {
   "use strict";
-  
-  var schedule = function(e) {
-    var source = jquery("#"+e.target.id);
-    var status = 'estimated';
-    if (source.attr('status') === 'actual') { status = 'removed'; }
-    if (source.attr('status') === 'estimated') { status = 'actual'; } 
+
+  var ajax = function(path, data, callback) {
     jquery.ajax({
       type: "POST",
       contentType: "application/json; charset=utf-8",
-      url: "api/schedule/iteration-for-engagement",
-      data: JSON.stringify({entity: null, iteration: source.attr('iteration'), engagement: source.attr('engagement')}),
-      success: function(data) {
-        jquery('#'+data.id).text(data.value);
-        jquery('#'+data.id).attr('status', data.status);
-      },
-      dataType: "json"}
-    );
+      url: path,
+      data: JSON.stringify(data),
+      success: callback,
+      dataType: "json"
+    });
   };
 
-  var fetchAndPlot = function(set, ctx) {
-      jquery.ajax({
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        url: "api/data",
-        data: JSON.stringify({start: Date(2015, 1, 5), end: Date(2015, 12, 31), set: set, team: 1}),
-        success: function(data) {
-          new Chartjs(ctx).Line(data);
-        },
-        dataType: "json"}
-      );
+  var flashHtml = function(message, cssClass) {
+    return '<div id="flashes" class="container alert '+cssClass+'><button type="button" data-dismiss="alert" class="close"><span aria-hidden="true">x</span><span class="sr-only">Close</span></button><p>'+message+'</p></div>'
   };
 
-  return {schedule: schedule,
-          plotIndexCharts: function(financeCanvas, utilizationCanvas) {
-            fetchAndPlot('finance', financeCanvas);
-            fetchAndPlot('utilization', utilizationCanvas);
-          }};
+  var newClientFormHtml = function() {
+    <form entity="Client">
+      <div class="form-group" field="name">
+        <label class="control-label">Name</label>
+        <input class="form-control" type="text" value>
+      </div>
+      <button class="btn btn-default" onclick=formSubmitter(this)>Submit</button>
+    </form>
+  };
 
+  var markAllErrors = function(data) {
+    for (error in data) markError(error);
+  };
+
+  var markError = function(data) {
+    jquery('#'+data.id).addClass('has-error');
+    jquery('#'+data.id).append('<p> class="help-block">'+data.message+'</p>');
+  };
+
+  var unmarkAllErrors = function() {
+    jquery('div.has-error p').remove();
+    jquery('div.has-error').removeClass('has-error');
+  };
+
+  var flashSuccessHandler = function(data) {
+    unmarkAllErrors();
+    jquery('#flashes').remove();
+    jquery('#header').prepend(flashHtml(data.message, 'success'));
+  };
+
+  var flashErrorHandler = function(data) {
+    unmarkAllErrors();
+    jquery('#flashes').remove();
+    jquery('#header').prepend(flashHtml(data.message, 'danger'));
+    markAllErrors();
+  };
+
+  var formSubmitter = function(el) {
+    var data = {};
+    data.entity = el.parent().attr('entity');
+    for (del in el.siblings()) {
+      data[del.attr('field')] = del.children('input').attr('value');
+    }
+    ajax(el.attr(url), data, el.attr(callback));
+  };
+
+  var newClientForm = function(el) {
+    el.append(newClientFormHtml());
+  };
+
+  return {}
 })($ || {}, Chart.noConflict() || {});

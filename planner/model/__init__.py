@@ -34,7 +34,7 @@ TeamIterationCost = Table(
 
 class Engagement(Api, Base):
     __apientityname__ = 'Engagement'
-    __apifields__ = ['id', 'name', 'proposal', 'backlog', 'revenue', 'isrnd',
+    __apifields__ = ['name', 'proposal', 'backlog', 'revenue', 'isrnd',
                      'client', 'status', 'alignment', 'sustainability',
                      'probability', 'complexity', 'actual', 'estimated',
                      'team']

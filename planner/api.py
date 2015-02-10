@@ -1,6 +1,3 @@
-from collections import OrderedDict
-import pdb
-
 from flask import request, jsonify
 
 
@@ -22,15 +19,12 @@ class Api(object):
     __apifields__ = None
 
     def to_dict(self):
-        d = OrderedDict()
-        d['entity'] = self.__apientityname__
+        d = {'entity': self.__apientityname__}
         for field in self.__apifields__:
             try:
                 d[field] = getattr(self, field)
-                if not isinstance(d[field], OrderedDict):
-                    d[field] = d[field].to_dict()
-            except Exception:
-                d[field] = None
+            except Exception as e:
+                d[field] = e
 
         return d
 
@@ -42,14 +36,21 @@ class Api(object):
 
             r = cls()
             for field in cls.__apifields__:
-                r.__setattr__(field, data[field])
+                setattr(r, field, data[field])
         except KeyError:
             raise EntityTranslationError
 
         return r
 
     def __eq__(self, other):
-        return self.to_dict() == other.to_dict()
+        if len(other.__apifields__) != len(self.__apifields__):
+            return False
+        if other.__apientityname__ != self.__apientityname__:
+            return False
+        for field in self.__apifields__:
+            if getattr(self, field) != getattr(other, field):
+                return False
+        return True
 
 
 class Routes(object):
@@ -88,7 +89,6 @@ class Create(object):
 
     def __call__(self):
         with self.transaction() as db:
-            pdb.set_trace()
             data = request.get_json()
             db.add(self.model.from_dict(data))
 
