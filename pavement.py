@@ -51,8 +51,9 @@ def unit():
     """
     suite = unittest.TestLoader().discover('test', pattern="_test_*.py")
     result = unittest.TextTestRunner(verbosity=2).run(suite)
-    if not result.errors == 0 and result.failures == 0:
+    if result.errors or result.failures:
         raise BuildFailure
+    return result.errors + result.failures
 
 
 @task
@@ -82,8 +83,9 @@ def acceptance():
     """
     suite = unittest.TestLoader().discover('test', pattern='_acceptance_*.py')
     result = unittest.TextTestRunner(verbosity=2).run(suite)
-    if not result.errors == 0 and result.failures == 0:
+    if result.errors or result.failures:
         raise BuildFailure
+    return result.errors + result.failures
 
 
 @task
