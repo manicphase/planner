@@ -34,10 +34,10 @@ TeamIterationCost = Table(
 
 class Engagement(Api, Base):
     __apientityname__ = 'Engagement'
-    __apifields__ = ['name', 'proposal', 'backlog', 'revenue', 'isrnd',
-                     'client', 'status', 'alignment', 'sustainability',
-                     'probability', 'complexity', 'actual', 'estimated',
-                     'team']
+    __apifields__ = ['name', 'proposal', 'backlog', 'revenue', 'isrnd']
+    __complexapifields__ = ['alignment', 'probability', 'sustainability',
+                            'status', 'actual', 'estimated', 'team', 'client',
+                            'complexity']
     __tablename__ = 'Engagement'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False)
@@ -74,7 +74,8 @@ class Engagement(Api, Base):
 
 class Client(Api, Base):
     __apientityname__ = 'Client'
-    __apifields__ = ['name', 'contact']
+    __apifields__ = ['name']
+    __complexapifields__ = ['contact']
     __tablename__ = 'Client'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
@@ -158,7 +159,8 @@ class EngagementComplexity(Api, Base):
 
 class Iteration(Api, Base):
     __apientityname__ = 'Iteration'
-    __apifields__ = ['id', 'startdate', 'actual', 'estimated']
+    __apifields__ = ['startdate']
+    __complexapifields__ = ['actual', 'estimated']
     __tablename__ = 'Iteration'
     id = Column(Integer, autoincrement=True, primary_key=True)
     startdate = Column(Date, nullable=False)
@@ -217,7 +219,8 @@ class Contact(Api, Base):
 
 class TeamCost(Api, Base):
     __apientityname__ = 'TeamCost'
-    __apifields__ = ['value', 'team', 'iteration']
+    __apifields__ = ['value']
+    __complexapifields__ = ['team', 'iteration']
     __tablename__ = 'TeamCost'
     id = Column(Integer, autoincrement=True, primary_key=True)
     value = Column(Integer, nullable=False)

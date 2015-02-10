@@ -1,4 +1,3 @@
-import unittest
 from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError
@@ -83,7 +82,6 @@ class TestIteration(ModelTestCase):
             with self.transaction() as db:
                 db.add(Iteration(startdate=None))
 
-    @unittest.skip("Temp")
     def test_iteration_should_accurately_represent_actual_engagements(self):
         expected = Engagement(name="Name", revenue=0)
         with self.transaction() as db:

@@ -16,12 +16,21 @@ def crudify(app, read=None, delete=None, update=None, create=None):
 
 class Api(object):
     __apientityname__ = None
-    __apifields__ = None
+    __apifields__ = []
+    __complexapifields__ = []
 
-    def to_dict(self):
+    def to_dict(self, recur=True):
         d = {'entity': self.__apientityname__}
         for field in self.__apifields__:
             d[field] = getattr(self, field)
+        if recur:
+            for field in self.__complexapifields__:
+                d[field] = []
+                try:
+                    for f in getattr(self, field):
+                        d[field].append(f.to_dict(recur=False))
+                except TypeError:
+                    d[field] = None
 
         return d
 
@@ -47,6 +56,7 @@ class Api(object):
         for field in self.__apifields__:
             if getattr(self, field) != getattr(other, field):
                 return False
+
         return True
 
 
