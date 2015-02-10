@@ -21,10 +21,7 @@ class Api(object):
     def to_dict(self):
         d = {'entity': self.__apientityname__}
         for field in self.__apifields__:
-            try:
-                d[field] = getattr(self, field)
-            except Exception as e:
-                d[field] = e
+            d[field] = getattr(self, field)
 
         return d
 
