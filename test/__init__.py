@@ -28,45 +28,124 @@ class AcceptanceTestCase(BaseTestCase):
 
 
 class ModelTestCase(BaseTestCase):
+    def assertHasValidUkMobileNumber(self, model, **others):
+        self.assertHasValidAttribute(
+            model, 'mobileno', '0712345678', valid_set=['07123456789'],
+            invalid_set=['ten', '071234567890', '1234567890', '071234567'])
+
     def assertHasUniqueName(self, model, **others):
-        with self.assertRaises(IntegrityError):
+        self.assertHasUniqueAttribute(model, 'name', 'Name', **others)
+
+    def assertHasUniqueValue(self, model, value, **others):
+        self.assertHasUniqueAttribute(model, 'value', value, **others)
+
+    def assertHasAttribute(self, model, attribute, **others):
+        with self.assertRaises((IntegrityError, ValidationError)):
             with self.transaction() as db:
-                db.add(model(name=None))
+                m = model(**others)
+                setattr(m, attribute, None)
+                db.add(m)
+
+    def assertHasUniqueAttribute(self, model, attribute, valid, **others):
+        self.assertHasAttribute(model, attribute, **others)
 
         with self.transaction() as db:
-            db.add(model(name="Name", **others))
+            m = model(**others)
+            setattr(m, attribute, valid)
+            db.add(m)
 
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises((IntegrityError, ValidationError)):
             with self.transaction() as db:
-                db.add(model(name="Name", **others))
+                m = model(**others)
+                setattr(m, attribute, valid)
+                db.add(m)
 
-    def assertHasValidValue(self, model, low, high, **others):
-        with self.assertRaises(ValidationError):
-            with self.transaction() as db:
-                db.add(model(value=None, **others))
-
-        with self.assertRaises(ValidationError):
-            with self.transaction() as db:
-                db.add(model(value=low - 0.1, **others))
-
-        with self.assertRaises(ValidationError):
-            with self.transaction() as db:
-                db.add(model(value=high + 0.1, **others))
-
+    def assertHasValidAttribute(
+            self, model, attribute, valid, low=None, high=None, unit=None,
+            valid_set=None, invalid_set=None, unique=False, lowlen=None,
+            highlen=None, **others):
         with self.transaction(rollback=True) as db:
-            db.add(model(value=low, **others))
+            m = model(**others)
+            setattr(m, attribute, valid)
+            db.add(m)
 
-        with self.transaction() as db:
-            db.add(model(value=high, **others))
+        self.assertHasAttribute(model, attribute, **others)
 
-    def assertHasUniqueValue(self, model, **others):
-        second_name = others['name'][1:]
+        if unique:
+            self.assertHasUniqueAttribute(model, attribute, valid, **others)
 
-        with self.transaction() as db:
-            db.add(model(value=0.5, **others))
+        if low or high and not unit:
+            raise AssertionError(
+                "Unable to perform bounds check as unit not provided")
 
-        others['name'] = second_name
+        if low and unit:
+            with self.assertRaises(ValidationError):
+                with self.transaction() as db:
+                    m = model(**others)
+                    setattr(m, attribute, low - unit)
+                    db.add(m)
 
-        with self.assertRaises(IntegrityError):
-            with self.transaction() as db:
-                db.add(model(value=0.5, **others))
+            with self.transaction(rollback=True) as db:
+                m = model(**others)
+                setattr(m, attribute, low)
+                db.add(m)
+
+        if high and unit:
+            with self.assertRaises(ValidationError):
+                with self.transaction() as db:
+                    m = model(**others)
+                    setattr(m, attribute, high + unit)
+                    db.add(m)
+
+            with self.transaction(rollback=True) as db:
+                m = model(**others)
+                setattr(m, attribute, high)
+                db.add(m)
+
+        if valid_set:
+            for valid in valid_set:
+                with self.transaction(rollback=True) as db:
+                    m = model(**others)
+                    setattr(m, attribute, valid)
+                    db.add(m)
+
+        if invalid_set:
+            for invalid in invalid_set:
+                with self.assertRaises(ValidationError):
+                    with self.transaction() as db:
+                        m = model(**others)
+                        setattr(m, attribute, invalid)
+                        db.add(m)
+        try:
+            if lowlen:
+                with self.assertRaises(ValidationError):
+                    with self.transaction() as db:
+                        m = model(**others)
+                        setattr(m, attribute, valid[:lowlen - 1])
+                        db.add(m)
+
+                with self.transaction(rollback=True) as db:
+                    m = model(**others)
+                    setattr(m, attribute, valid[:lowlen])
+                    db.add(m)
+
+            if highlen:
+                invalid = valid
+                while len(invalid) < highlen:
+                    invalid += valid
+
+                with self.assertRaises(ValidationError):
+                    with self.transaction() as db:
+                        m = model(**others)
+                        setattr(m, attribute, invalid)
+                        db.add(m)
+
+                with self.transaction(rollback=True) as db:
+                    m = model(**others)
+                    setattr(m, attribute, invalid[:highlen])
+                    db.add(m)
+
+        except ValueError:
+            raise AssertionError("Provided length checking boundary but valid value is not iterable")  # noqa
+        except IndexError:
+            raise AssertionError("Provided length checking boundary but valid value is not compatible with boundary lengths required")  # noqa
