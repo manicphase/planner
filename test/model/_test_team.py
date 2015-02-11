@@ -8,12 +8,6 @@ class TestTeam(ModelTestCase):
         self.assertHasUniqueName(Team, capacity=1.0, revenuecap=1, devmax=0.4,
                                  researchmax=0.6)
 
-    def test_team_capacity_should_exceed_sum_of_researchmax_and_devmax(self):
-        with self.assertRaises(ValidationError):
-            with self.transaction() as db:
-                db.add(Team(name="Name", capacity=0, revenuecap=1, devmax=0.1,
-                            researchmax=0.1))
-
 
 class TestTeamMember(ModelTestCase):
     def test_team_member_should_have_forename(self):

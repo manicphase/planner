@@ -10,13 +10,14 @@ class TestClient(ModelTestCase):
     def test_client_should_have_correct_contact(self):
         with self.transaction() as db:
             db.add(Client(name="Name",
-                          contact=Contact(forename="Mc", surname="Test")))
+                          contacts=[Contact(forename="Mc", surname="Test")]))
 
         with self.transaction() as db:
             actual = db.query(Client).first()
 
-        self.assertEquals("Mc", actual.contact.forename)
-        self.assertEquals("Test", actual.contact.surname)
+        self.assertEquals(1, len(actual.contacts))
+        self.assertEquals("Mc", actual.contacts[0].forename)
+        self.assertEquals("Test", actual.contacts[0].surname)
 
 
 class TestContact(ModelTestCase):

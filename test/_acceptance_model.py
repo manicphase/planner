@@ -1,7 +1,8 @@
 import datetime
 
 from test import ModelTestCase
-from planner.model.iteration import Iteration, EstimatedIteration
+from planner.model import EngagementIteration, EstimatedEngagementIteration
+from planner.model.iteration import Iteration
 from planner.model.engagement import (
     Engagement, Status, Complexity, Probability, Alignment, Sustainability,
     Expense, ExpenseType
@@ -62,16 +63,19 @@ class ModelAcceptanceTests(ModelTestCase):
             expenses=[unpaid_travel_expense, paid_travel_expense,
                       unpaid_systems_expense])
         negotiation_engagement = Engagement(
-            name="NegotiationEngagement", revnue=1000, team=team,
+            name="NegotiationEngagement", revenue=1000, team=team,
             client=agency, status=negotiation, complexity=small,
             probability=p_evens, sustainability=s_evens, alignment=a_evens,
             expenses=[])
 
-        a_it_one = Iteration(startdate=datetime.date(2015, 01, 01),
-                             engagements=[sold_engagement])
-        e_it_one = EstimatedIteration(
-            startdate=datetime.date(2015, 01, 01),
-            engagements=[negotiation_engagement])
+        first_iteration = Iteration(startdate=datetime.date(2015, 01, 01))
+
+        a_it_one = EngagementIteration(
+            iteration=first_iteration,
+            engagement=sold_engagement)
+        e_it_one = EstimatedEngagementIteration(
+            iteration=first_iteration,
+            engagement=negotiation_engagement)
 
         with self.transaction() as db:
             db.add(tm_one_training)

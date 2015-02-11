@@ -37,6 +37,34 @@ class Engagement(Base):
 
     expenses = relationship("Expense")
 
+    actualiterations = relationship("EngagementIteration")
+    estimatediterations = relationship("EstimatedEngagementIteration")
+
+
+class Expense(Base):
+    __tablename__ = 'Expense'
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    value = Column(Integer, nullable=False)
+    trackerid = Column(Text, nullable=False)
+    paid = Column(Boolean, nullable=False)
+
+    engagementid = Column(Integer, ForeignKey('Engagement.id'))
+    typeid = Column(Integer, ForeignKey('ExpenseType.id'))
+
+    type = relationship("ExpenseType")
+
+    @validates('value')
+    def validate_value(self, key, address):
+        if address < 0:
+            raise ValidationError
+        return address
+
+
+class ExpenseType(Base):
+    __tablename__ = "ExpenseType"
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    name = Column(Text, nullable=False, unique=True)
+
 
 class Status(Base):
     __tablename__ = 'Status'

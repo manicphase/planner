@@ -15,12 +15,6 @@ class Team(Base):
 
     members = relationship("TeamMember")
 
-    @validates('capacity')
-    def validate_capacity(self, key, address):
-        if address < self.devmax + self.researchmax:
-            raise ValidationError(str(address) + ' is invalid')
-        return address
-
 
 class TeamMember(Base):
     __tablename__ = 'TeamMember'
@@ -37,8 +31,6 @@ class TeamMember(Base):
 
     teamid = Column(Integer, ForeignKey("Team.id"))
 
-    costs = Column(Integer, ForeignKey("Cost.id"))
-
     @validates('title')
     def validate_title(self, key, address):
         if address not in ['Mr', 'Miss', 'Dr', 'Mrs']:
@@ -49,7 +41,7 @@ class TeamMember(Base):
     @validates('gmail')
     def validate_gmail(self, key, address):
         if '@' not in address:
-            raise ValidationError(address + ' is invalid')
+            raise ValidationError(str(address) + ' is invalid')
 
         return address
 
@@ -71,9 +63,9 @@ class Cost(Base):
     value = Column(Integer, nullable=False)
 
     costtypeid = Column(Integer, ForeignKey("CostType.id"))
-    teammemberid = Column(Integer, ForeignKey("Cost.id"))
+    teammemberid = Column(Integer, ForeignKey("TeamMember.id"))
 
-    teammember = Column(Integer, ForeignKey("TeamMember.id"))
+    teammember = relationship("TeamMember")
     type = relationship("CostType")
 
     @validates('value')

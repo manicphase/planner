@@ -9,9 +9,7 @@ class Client(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
 
-    contactid = Column(Integer, ForeignKey("Contact.id"))
-
-    contact = relationship("Contact", lazy="subquery")
+    contacts = relationship("Contact", lazy="subquery")
 
 
 class Contact(Base):
@@ -26,6 +24,8 @@ class Contact(Base):
     postcode = Column(Text)
     streetname = Column(Text)
     streetnumber = Column(Text)
+
+    clientid = Column(Integer, ForeignKey("Client.id"))
 
     @validates('email')
     def validate_email(self, key, address):
