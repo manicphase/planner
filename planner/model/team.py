@@ -72,8 +72,8 @@ class Cost(Base):
 
     costtypeid = Column(Integer, ForeignKey("CostType.id"))
     teammemberid = Column(Integer, ForeignKey("Cost.id"))
-    iterationid = Column(Integer, ForeignKey("Iteration.id"))
 
+    teammember = Column(Integer, ForeignKey("TeamMember.id"))
     type = relationship("CostType")
 
     @validates('value')
