@@ -1,7 +1,9 @@
 import unittest
+import datetime
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.inspection import inspect
 
 from planner import create_app
 from planner.model import ValidationError
@@ -19,6 +21,35 @@ class BaseTestCase(unittest.TestCase):
     def setUp(self):
         engine = create_engine('sqlite:///:memory:')
         self.transaction = TransactionFactory(bind=engine, create_all=True)
+
+
+class TranslationTestCase(BaseTestCase):
+    def assertModelsEqual(self, expected, actual):
+        if expected is not None and actual is not None:
+            if not hasattr(expected, '__table__'):
+                for e, a in zip(expected, actual):
+                    self.assertModelsEqual(e, a)
+            else:
+                self.assertEqual(expected.__tablename__, actual.__tablename__)
+                for column in expected.__table__.columns:
+                    evalue = getattr(expected, column.name)
+                    avalue = getattr(actual, column.name)
+                    if evalue != avalue:
+                        raise AssertionError(
+                            '%s MISMATCH %s VS %s' % (column, evalue, avalue))
+                for relation in inspect(expected.__class__).relationships:
+                    self.assertModelsEqual(getattr(expected, relation.key),
+                                           getattr(actual, relation.key))
+
+    def assertDictsEqual(self, expected, actual):
+        assert hasattr(expected, 'iteritems')
+        assert hasattr(actual, 'iteritems')
+        for key, value in expected.iteritems():
+            if hasattr(value, 'iteritems'):
+                self.assertDictsEqual(value, actual[key])
+            elif type(value) in [bool, int, str, unicode, float,
+                                 datetime.date]:
+                self.assertEqual(value, actual[key])
 
 
 class AcceptanceTestCase(BaseTestCase):
