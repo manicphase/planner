@@ -4,6 +4,8 @@ import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
+from BeautifulSoup import BeautifulSoup
+from jinja2 import Environment, PackageLoader
 
 from planner import create_app
 from planner.model import ValidationError
@@ -53,7 +55,33 @@ class TranslationTestCase(BaseTestCase):
 
 
 class TemplateTestCase(BaseTestCase):
-    pass
+    def setUp(self):
+        super(BaseTestCase, self).setUp()
+        self.environment = Environment(loader=PackageLoader('planner'))
+
+    def render_template(self, name, **kwargs):
+        return self.environment.get_or_select_template(name).render(**kwargs)
+
+    def html(self, name, **kwargs):
+        return BeautifulSoup(self.render_template(name, **kwargs))
+
+    def html_by_id(self, name, id, **kwargs):
+        if type(name) in [str, unicode]:
+            html = self.html(name, **kwargs)
+        else:
+            html = name
+        return html.find(id=id)
+
+    def assertHasCorrectAttr(self, html, attr, value):
+        self.assertIsNotNone(html)
+        self.assertEquals(value, html.get(attr))
+
+    def assertFormContainsAllFields(self, form, *fields):
+        for name, type in fields:
+            field = form.find(field=name)
+            self.assertIsNotNone(field)
+            self.assertIsNotNone(type, field.find(type=type))
+        self.assertTrue(form.find('button'))
 
 
 class AcceptanceTestCase(BaseTestCase):

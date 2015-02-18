@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_form %}
+{% block content %}
+<div class="container">
+  <h3>Add Client</h3>
+  <form id="addClientForm">
+    <div class="form-group" field="name">
+      <label class="control-label">Name</label>
+      <input class="form-control" type="text" value>
+    </div>
+    <button class="btn btn-default">Submit</button>
+  </form> 
+</div>
+{% endblock %}

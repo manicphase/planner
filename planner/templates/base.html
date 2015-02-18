@@ -9,55 +9,15 @@
   <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
   <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-  <script type="text/javascript" src="https://cdn.rawgit.com/nnnick/Chart.js/master/Chart.min.js"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
   <title>Planner</title>
 </head>
 
 <body>
-{% block alerts %}
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <div class="container alert bg-info">
-        <button type="button" data-dismiss="alert" class="close">
-          <span aria-hidden="true">&times;</span>
-          <span class="sr-only">Close</span>
-        </button>
-        {% for message in messages %}
-        <p>{{ message }}</p>
-      {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-{% endblock %}
-
-{% block navbar %}
-<div id="main" class="container clear-top">
-  <div class="navbar navbar-default navbar-static-top" role="navigation">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-          <span class="sr-only">Toggle navigation</span>
-        </button>
-        <a class="navbar-brand" href="{{ url_for('index') }}">Planner</a>
-      </div>
-
-      <div class="navbar-collapse collapse">
-        <ul class="nav navbar-nav">
-          <li><a name='schedule' href="{{ url_for('schedule') }}">Schedule</a></li>
-          <li><a name='add-engagement' href="{{ url_for('add_engagement') }}">Add Engagement</a></li>
-          <li><a name='clients' href="{{ url_for('clients') }}">Clients</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
 <div class="container body-content">
   {% block content %}
   {% endblock %}
+<script id='appScript' type='text/javascript'>
+  var app = {};
+</script>
 </body>
-
 </html>

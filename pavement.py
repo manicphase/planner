@@ -19,7 +19,7 @@ options(
     ),
     virtualenv=Bunch(
         packages_to_install=['SQLAlchemy', 'Flask', 'wtforms', 'virtualenv',
-                             'flake8', 'ipython', 'coverage'],
+                             'flake8', 'ipython', 'coverage', 'BeautifulSoup'],
         script_name='bootstrap.py',
         dest_dir='venv'
     )
@@ -100,6 +100,13 @@ def clean():
     """
     return max([sh('rm -rf ./*.zip bootstrap.py ./*.egg* build'),
                 sh('find . -name "*.pyc" -delete')])
+
+
+@task
+def jsunit():
+    """Run javascript unit tests
+    """
+    return sh("phantomjs scripts/runner.js test/tests.html")
 
 
 @task
