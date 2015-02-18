@@ -52,6 +52,10 @@ class TranslationTestCase(BaseTestCase):
                 self.assertEqual(value, actual[key])
 
 
+class TemplateTestCase(BaseTestCase):
+    pass
+
+
 class AcceptanceTestCase(BaseTestCase):
     def setUp(self):
         self.app = create_app(TestConfig)
