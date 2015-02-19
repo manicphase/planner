@@ -1,4 +1,6 @@
+import os
 import unittest
+import fnmatch
 
 from paver.easy import options, task, needs, sh, Bunch
 from paver.runtime import BuildFailure
@@ -40,6 +42,7 @@ def once():
 def build():
     """Build
     """
+    pass
 
 
 @task
@@ -86,7 +89,7 @@ def acceptance():
 
 
 @task
-@needs(['clean', 'build', 'lint', 'unit', 'acceptance'])
+@needs(['clean', 'build', 'lint', 'jslint', 'unit', 'acceptance'])
 @virtualenv(dir="venv")
 def ci():
     """Run the continuous integration pipeline
@@ -102,11 +105,28 @@ def clean():
                 sh('find . -name "*.pyc" -delete')])
 
 
+def recursive_glob(pattern, *directories):
+    matches = []
+    for directory in directories:
+        for root, dirs, files in os.walk(directory):
+            for filename in fnmatch.filter(files, pattern):
+                matches.append(os.path.join(root, filename))
+    return matches
+
+
 @task
 def jsunit():
     """Run javascript unit tests
     """
-    return sh("phantomjs scripts/runner.js test/tests.html")
+    return sh("phantomjs scripts/jstestrunner.js test/tests.html")
+
+
+@task
+def jslint():
+    """Run linting on javascript
+    """
+    files = recursive_glob('*.js', 'scripts', 'planner/static', 'test')
+    return sh('phantomjs scripts/jslintrunner.js ' + ' '.join(files))
 
 
 @task

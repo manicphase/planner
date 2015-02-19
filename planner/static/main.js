@@ -1,7 +1,7 @@
 /* global $, Chart */
 
-var app = (function(jquery, Chartjs) {
-  "use strict";
+var app = (function () {
+    "use strict";
 
-  return {}
-})($ || {}, Chart.noConflict() || {});
+    return {};
+}());
