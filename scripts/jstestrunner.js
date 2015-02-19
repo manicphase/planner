@@ -30,12 +30,13 @@
     };
 
     var populateFailures = function () {
-        failures = 0;
-        page.evaluate(function () {
+        results = page.evaluate(function () {
+            var results = [];
+            var failures = 0;
             var i,
                 result,
                 resultHtml,
-                elements = document.getElementById('quint-tests').childNodes;
+                elements = document.getElementById('qunit-tests').childNodes;
             for (i = 0; i < elements.length; i = i + 1) {
                 resultHtml = elements[i];
                 result = {};
@@ -45,11 +46,13 @@
                 result.diff = resultHtml.getElementsByClassName('test-diff')[0].textContent;
                 result.source = resultHtml.getElementsByClassName('test-source')[0].textContent;
                 result.status = resultHtml.className;
-                if (resultHtml.className === "fail") {
+                if (result.status === "fail") {
                     failures = failures + 1;
+                    console.log("failure logged");
                 }
                 results.push(result);
             }
+            return results;
         });
     };
 
@@ -61,13 +64,14 @@
     };
 
     var exit = function () {
+        console.log("results count = " + results.length);
         if (failures === -1) {
             console.log("ERROR: TIMEOUT");
         } else {
             var i;
             for (i = 0; i < results.length; i = i + 1) {
                 var result = results[i];
-                console.log('[' + result.time + '] ' + result.name + ': ' + result.msg + ' -> ' + result.status + '...\n' + result.diff + '\n\t\t' + result.source);
+                console.log('[' + result.time + '] ' + result.name + ': ' + result.msg + ' -> ' + result.status + '...\n' + result.diff + '\n' + result.source + "\n");
             }
             if (failures === 0) {
                 console.log("PASSED");
@@ -76,6 +80,10 @@
             }
         }
         phantom.exit(failures);
+    };
+
+    page.onConsoleMessage = function (msg) {
+        console.log('console: ' + msg);
     };
 
     page.open(url, function () {
