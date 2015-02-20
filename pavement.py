@@ -89,7 +89,7 @@ def acceptance():
 
 
 @task
-@needs(['clean', 'build', 'lint', 'jslint', 'unit', 'acceptance'])
+@needs(['clean', 'build', 'lint', 'jslint', 'unit', 'jsunit', 'acceptance'])
 @virtualenv(dir="venv")
 def ci():
     """Run the continuous integration pipeline

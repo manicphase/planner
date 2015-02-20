@@ -2,25 +2,22 @@
 (function () {
     'use strict';
     var page = require('webpage').create(),
-        failures = null,
         threeSeconds = 3001,
         url = 'test/tests.html',
-        results = [];
+        report;
 
     var concluded = function (cond, start, timeout) {
         return new Date().getTime() - start >= timeout || cond;
     };
 
     var waitFor = function (pred, callback, timeout, next) {
-        var start = new Date().getTime();
-        var cond = false;
+        var start = new Date().getTime(),
+            cond = false;
         var  interval = window.setInterval(function () {
             if (concluded(cond, start, timeout)) {
                 window.clearInterval(interval);
                 if (cond) {
-                    callback();
-                } else {
-                    failures = -1;
+                    next(callback());
                 }
                 next();
             } else {
@@ -30,29 +27,38 @@
     };
 
     var populateFailures = function () {
-        results = page.evaluate(function () {
+        report = page.evaluate(function () {
+            var tests = document.getElementById('qunit-tests').childNodes;
             var results = [];
+            var result;
+            var resultHtml;
             var failures = 0;
-            var i,
-                result,
-                resultHtml,
-                elements = document.getElementById('qunit-tests').childNodes;
-            for (i = 0; i < elements.length; i = i + 1) {
-                resultHtml = elements[i];
-                result = {};
-                result.name = resultHtml.getElementsByClassName('test-name')[0].textContent;
-                result.msg = resultHtml.getElementsByClassName('test-message')[0].textContent;
-                result.time = resultHtml.getElementsByClassName('runtime')[0].textContent;
-                result.diff = resultHtml.getElementsByClassName('test-diff')[0].textContent;
-                result.source = resultHtml.getElementsByClassName('test-source')[0].textContent;
-                result.status = resultHtml.className;
-                if (result.status === "fail") {
+            var i;
+            for (i = 0; i < tests.length; i = i + 1) {
+                if (tests[i].className === 'fail') {
                     failures = failures + 1;
-                    console.log("failure logged");
+                }
+                resultHtml = tests[i];
+                console.log(resultHtml);
+                result = {};
+                result.status = resultHtml.className;
+                result.name = resultHtml.getElementsByClassName('test-name')[0].textContent;
+                result.time = resultHtml.getElementsByClassName('runtime')[0].textContent;
+                result.msg = '';
+                result.diff = '';
+                result.source = '';
+                if (result.status === 'fail') {
+                    result.msg = resultHtml.getElementsByClassName('test-message')[0].textContent;
+                    result.source = resultHtml.getElementsByClassName('test-source')[0].textContent;
+                    if (result.msg.indexOf('Died') !== 0) {
+                        result.diff = resultHtml.getElementsByClassName('test-diff')[0].textContent;
+                    } else {
+                        result.status = 'error';
+                    }
                 }
                 results.push(result);
             }
-            return results;
+            return {'failures': failures, 'results': results};
         });
     };
 
@@ -64,26 +70,41 @@
     };
 
     var exit = function () {
-        console.log("results count = " + results.length);
-        if (failures === -1) {
-            console.log("ERROR: TIMEOUT");
+        if (report === null) {
+            console.log("ERROR");
+            phantom.exit(1);
         } else {
-            var i;
+            var i,
+                results = report.results,
+                result;
             for (i = 0; i < results.length; i = i + 1) {
-                var result = results[i];
-                console.log('[' + result.time + '] ' + result.name + ': ' + result.msg + ' -> ' + result.status + '...\n' + result.diff + '\n' + result.source + "\n");
+                result = results[i];
+                console.log(result.status.toUpperCase() + ' [' + result.time + '] ' + result.name + '\n');
+                if (result.status === 'fail') {
+                    console.log(result.msg + '\n' + result.diff + '\n' + result.source + '\n');
+                } else if (result.status === 'error') {
+                    console.log(result.msg + '\n' + result.source + '\n');
+                }
             }
-            if (failures === 0) {
+            if (report.failures === 0) {
                 console.log("PASSED");
             } else {
                 console.log("FAILED");
             }
         }
-        phantom.exit(failures);
+        phantom.exit(report.failures);
     };
 
     page.onConsoleMessage = function (msg) {
-        console.log('console: ' + msg);
+        console.log("BROWSER CONSOLE: " + msg);
+    };
+
+    page.onError = function (msg, trace) {
+        console.log("BROWSER CONSOLE ERROR: " + msg);
+    };
+
+    page.onResourceError = function (metadata) {
+        console.log("BROWSER CONSOLE RESOURCE ERROR: " + metadata.errorString);
     };
 
     page.open(url, function () {
