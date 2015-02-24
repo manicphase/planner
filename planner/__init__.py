@@ -1,4 +1,4 @@
-from flask import Flask, abort, current_app, render_template, Blueprint
+from flask import Flask, abort, current_app, render_template, Blueprint, send_from_directory
 
 from planner.model.connect import TransactionFactory
 from planner.flags import Flag
@@ -24,7 +24,15 @@ def create_app(config=HeadConfig):
 @ui.route('/')
 @feature
 def index():
-    return "TODO: fix the templates"
+    return render_template('index.html')
+
+
+@ui.route('/static/<path:filename>')
+@feature
+def serve_static_files(filename):
+    import glob
+    print glob.glob("planner/*")
+    return send_from_directory("static/", filename)
 
 
 @ui.route('/schedule')
@@ -57,7 +65,21 @@ def add_contact():
     return render_template('add-contact.html')
 
 
-@api.route('/api/schedule/iteration-for-engagement')
+@api.route('/api/schedule/engagement_iterations')
 @feature
-def schedule_iteration_for_engagement(self):
+def engagement_iterations():
+    # access db and that
+    demo_json = '{"cost":[[1420416000000.0,500],[1421625600000.0,500],' + \
+                '[1422835200000.0,500],[1424044800000.0,500]],' + \
+                '"revenue":[[1420416000000.0,0],[1421625600000.0,100],' + \
+                '[1422835200000.0,500],[1424044800000.0,2000]]}'
+    return demo_json
+    pass
+
+
+@api.route('/api/schedule/engagement_iterations/<iteration>')
+@feature
+def single_engagement_iteration(iteration):
+    # access db and that
+    return iteration
     pass

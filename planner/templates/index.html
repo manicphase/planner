@@ -8,14 +8,17 @@
     </div>
     <div class="col-md-6">
       <h2>Cost and Revenue 2015</h2>
-      <canvas id="finance" width="400" height="400"></canvas>
+        <div>
+            <div id="finance" style="width:400px;height:400px"> </div>
+        </div>
     </div>
   </div>
 </div>
 <script type="text/javascript">
-  $(document).ready(function() {
-    app.plotIndexCharts($('#finance').get(0).getContext("2d"),
-                        $('#utilization').get(0).getContext("2d"));
-  });
+    var revenues = [];
+    var costs = [];
+    $(document).ready(function() {
+        populate_revenue_graph();
+    });
 </script>
 {% endblock %}
