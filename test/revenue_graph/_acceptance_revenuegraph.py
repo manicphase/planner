@@ -11,17 +11,12 @@ class ParsePage():
         self.resp = self.client.get('/')
         self.data = BeautifulSoup(self.resp.data)
 
-        # this bit is for manual debugging. yes i know i'm going to hell
-        print "\n==================================\n"
-        print self.data
-        print "\n==================================\n"
-
     def get_timestamp(self, time_tuple):
         dt = datetime.date(*time_tuple)
         timestamp = time.mktime(dt.timetuple())
         return timestamp
 
-    def get_json_set(self, url, request_data={}, request_type="post"):
+    def get_json_set(self, url, request_data={}, request_type="get"):
         request_type = request_type.lower()
         if request_type == "post":
             return_data = self.client.post(url, request_data)
@@ -39,7 +34,7 @@ class ParsePage():
             return_data = self.client.patch(url, request_data)
         else:
             return_data = self.client.get(url, request_data)
-        return json.loads(return_data)
+        return json.loads(return_data.data)
 
     # def _get_json_set(self, url, request_data={}, request_type="post"):
     #    return {"costs": [500, 500, 500, 500],
@@ -47,21 +42,18 @@ class ParsePage():
 
     def get_finances(self):
         # TODO: change url when API structur is agreed
-        data_dict = {"start": self.get_timestamp((2015, 1, 5)),
-                     "end": self.get_timestamp((2015, 12, 31)),
-                     "set": "finaces",
-                     "team": 1}
-        url = "/api/data"
+        data_dict = {}
+        url = "/api/schedule/engagement_iterations"
         return self.get_json_set(url, request_data=data_dict)
 
     def revenues(self):
         # TODO: this, properly
-        revenues = self.get_finances()["revenues"]
+        revenues = self.get_finances()["revenue"]
         return revenues
 
     def costs(self):
         # TODO: this, also
-        costs = self.get_finances()["costs"]
+        costs = self.get_finances()["cost"]
         return costs
 
     def get_revenue_graph(self):
@@ -76,10 +68,10 @@ class RevenueGraphAcceptanceTest(AcceptanceTestCase):
 
     def test_revenue_graph(self):
         # Given the team costs 500 in iteration one
-        iteration_one_costs = self.page.costs()[0]
+        iteration_one_costs = self.page.costs()[0][1]
 
         # And the revenue for projects in iteration one is 0
-        iteration_one_revenue = self.page.revenues()[0]
+        iteration_one_revenue = self.page.revenues()[0][1]
 
         # When I look at the revenue graph on the index page
         self.revenue_graph = self.page.get_revenue_graph()

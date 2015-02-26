@@ -1,4 +1,5 @@
-from flask import Flask, abort, current_app, render_template, Blueprint, send_from_directory
+from flask import (Flask, abort, current_app, render_template,
+                   Blueprint, send_from_directory)
 
 from planner.model.connect import TransactionFactory
 from planner.flags import Flag
